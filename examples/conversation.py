@@ -11,13 +11,28 @@ def start(update: Update, context: CallbackContext):
 
 def ask_weight(update: Update, context: CallbackContext):
     # not shown: persist height
+    user_input = update.message.text
+    if not user_input.isnumeric():
+        update.message.reply_text("Please give me a number.")
+        return None
+
+    context.user_data["height"] = int(user_input)
     update.message.reply_text("What is your weight?")
     return WAIT_WEIGHT
 
 
 def calculate_bmi(update: Update, context: CallbackContext):
     # not shown: retrieve height in persistence and weight from the message
-    update.message.reply_text("Your BMI is X")
+    user_input = update.message.text
+    if not user_input.isnumeric():
+        update.message.reply_text("Please give me a number.")
+        return None
+
+    height = context.user_data["height"]
+    weight = int(user_input)
+    bmi = weight/ ((height / 100) ** 2)
+
+    update.message.reply_text(f"Your BMI is {round(bmi,2)}")
     return ConversationHandler.END
 
 
