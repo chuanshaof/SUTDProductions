@@ -10,7 +10,7 @@ my_persistence = PicklePersistence(filename='my_file')
 bot = Bot('1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E')
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 updater = Updater('1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E', persistence=my_persistence, use_context=True)
-updater.bot.setWebhook('https://https://salty-refuge-04114.herokuapp.com/' + "1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E")
+updater.bot.setWebhook('https://boiling-river-22873.herokuapp.com/' + "1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E")
 
 temp_project = list()
 
