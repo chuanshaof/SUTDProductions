@@ -2,17 +2,27 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
+import logging
+
+import os
+
 WAIT_CODE, PROJECT_NAME, PROJECT_DESCRIPTION, PROJECT_POC, PROJECT_VENUE, PROJECT_PARTNERS, PROJECT_INSPIRATION, \
 PROJECT_ROLES, PROJECT_DEADLINE, PROJECT_REQUIREMENTS, PROJECT_TEAM, PROJECT_CONFIRM, LIST_PROJECTS, SOCIALS, \
 SUBSCRIBE, UNSUBSCRIBE, ANNOUNCE, START, REMOVE, EDIT, EDIT_CONFIRM = range(21)
+temp_project = list()
 
+PORT = int(os.environ.get('PORT', 5000))
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+TOKEN = '1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E'
 my_persistence = PicklePersistence(filename='my_file')
+
 bot = Bot('1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E')
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
-updater = Updater('1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E', persistence=my_persistence, use_context=True)
-updater.bot.setWebhook('https://boiling-river-22873.herokuapp.com/' + "1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E")
-
-temp_project = list()
 
 
 # User Interface
@@ -734,88 +744,113 @@ def view_projects(project: list) -> str:
     return view_proj
 
 
-updater.dispatcher.add_handler(CommandHandler("cancel", cancel))
-updater.dispatcher.add_handler(CommandHandler("clear_admins", clear_admins))
-updater.dispatcher.add_handler(CommandHandler("check_subs", check_subs))
+def error(update, context):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
-# Start handler
-updater.dispatcher.add_handler(ConversationHandler(
-    entry_points=[
-        CommandHandler("start", start)
-    ],
-    states={
-        START: [CallbackQueryHandler(start_query)]
-    },
-    fallbacks=[]
-))
 
-# Remove handler
-updater.dispatcher.add_handler(ConversationHandler(
-    entry_points=[
-        CommandHandler("remove", remove)
-    ],
-    states={
-        REMOVE: [CallbackQueryHandler(remove_confirm)]
-    },
-    fallbacks=[]
-))
+def main():
+    """Start the bot."""
+    # Create the Updater and pass it your bot's token.
+    # Make sure to set use_context=True to use the new context based callbacks
+    # Post version 12 this will no longer be necessary
+    updater = Updater(TOKEN, persistence=my_persistence, use_context=True)
 
-# Edit handler
-updater.dispatcher.add_handler(ConversationHandler(
-    entry_points=[
-        CommandHandler("edit", edit)
-    ],
-    states={
-        EDIT: [CallbackQueryHandler(edit_query)],
-        EDIT_CONFIRM: [MessageHandler(Filters.text, edit_confirmation)]
-    },
-    fallbacks=[]
-))
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
 
-# Admin handler
-updater.dispatcher.add_handler(ConversationHandler(
-    entry_points=[
-        CommandHandler("admin", admin)
-    ],
-    states={
-        WAIT_CODE: [MessageHandler(Filters.text, verify)]
-    },
-    fallbacks=[]
-))
+    # on different commands - answer in Telegram
+    dp.add_handler(CommandHandler("cancel", cancel))
+    dp.add_handler(CommandHandler("clear_admins", clear_admins))
+    dp.add_handler(CommandHandler("check_subs", check_subs))
 
-# Adding project
-updater.dispatcher.add_handler(ConversationHandler(
-    entry_points=[
-        CommandHandler("add", add)
-    ],
-    states={
-        PROJECT_NAME: [MessageHandler(Filters.text, project_name)],
-        PROJECT_DESCRIPTION: [MessageHandler(Filters.text, project_description)],
-        PROJECT_POC: [MessageHandler(Filters.text, project_poc)],
-        PROJECT_VENUE: [MessageHandler(Filters.text, project_venue)],
-        PROJECT_PARTNERS: [MessageHandler(Filters.text, project_partners)],
-        PROJECT_INSPIRATION: [MessageHandler(Filters.text, project_inspiration)],
-        PROJECT_ROLES: [MessageHandler(Filters.text, project_roles)],
-        PROJECT_DEADLINE: [MessageHandler(Filters.text, project_deadline)],
-        PROJECT_REQUIREMENTS: [MessageHandler(Filters.text, project_requirement)],
-        PROJECT_TEAM: [MessageHandler(Filters.text, project_team)],
-        PROJECT_CONFIRM: [CallbackQueryHandler(project_confirm)]
-    },
-    fallbacks=[]
-))
+    # Start handler
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+            CommandHandler("start", start)
+        ],
+        states={
+            START: [CallbackQueryHandler(start_query)]
+        },
+        fallbacks=[]
+    ))
 
-# Announce handler
-updater.dispatcher.add_handler(ConversationHandler(
-    entry_points=[
-        CommandHandler("announce", announce)
-    ],
-    states={
-        ANNOUNCE: [MessageHandler(Filters.all, announcement)]
-    },
-    fallbacks=[]
-))
+    # Remove handler
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+            CommandHandler("remove", remove)
+        ],
+        states={
+            REMOVE: [CallbackQueryHandler(remove_confirm)]
+        },
+        fallbacks=[]
+    ))
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    updater.start_polling()
+    # Edit handler
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+            CommandHandler("edit", edit)
+        ],
+        states={
+            EDIT: [CallbackQueryHandler(edit_query)],
+            EDIT_CONFIRM: [MessageHandler(Filters.text, edit_confirmation)]
+        },
+        fallbacks=[]
+    ))
+
+    # Admin handler
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+            CommandHandler("admin", admin)
+        ],
+        states={
+            WAIT_CODE: [MessageHandler(Filters.text, verify)]
+        },
+        fallbacks=[]
+    ))
+
+    # Adding project
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+            CommandHandler("add", add)
+        ],
+        states={
+            PROJECT_NAME: [MessageHandler(Filters.text, project_name)],
+            PROJECT_DESCRIPTION: [MessageHandler(Filters.text, project_description)],
+            PROJECT_POC: [MessageHandler(Filters.text, project_poc)],
+            PROJECT_VENUE: [MessageHandler(Filters.text, project_venue)],
+            PROJECT_PARTNERS: [MessageHandler(Filters.text, project_partners)],
+            PROJECT_INSPIRATION: [MessageHandler(Filters.text, project_inspiration)],
+            PROJECT_ROLES: [MessageHandler(Filters.text, project_roles)],
+            PROJECT_DEADLINE: [MessageHandler(Filters.text, project_deadline)],
+            PROJECT_REQUIREMENTS: [MessageHandler(Filters.text, project_requirement)],
+            PROJECT_TEAM: [MessageHandler(Filters.text, project_team)],
+            PROJECT_CONFIRM: [CallbackQueryHandler(project_confirm)]
+        },
+        fallbacks=[]
+    ))
+
+    # Announce handler
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+            CommandHandler("announce", announce)
+        ],
+        states={
+            ANNOUNCE: [MessageHandler(Filters.all, announcement)]
+        },
+        fallbacks=[]
+    ))
+
+    # log all errors
+    dp.add_error_handler(error)
+
+    # Start the Bot
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook('https://boiling-river-22873.herokuapp.com/' + TOKEN)
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT. This should be used most of the time, since
+    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
