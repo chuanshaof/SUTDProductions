@@ -90,7 +90,7 @@ def start_query(update: Update, context: CallbackContext) -> None:
         if query.data == "join" + each[0]:
             HAORON = 255414224
             CS = 229599548
-            bot.sendMessage(chat_id=HAORON,
+            bot.sendMessage(chat_id=CS,
                             text=f"Hi Haoron, @{query.from_user.username} has signed up for the following project.\n\n"
                                  f"{view_projects(each)}",
                             parse_mode=ParseMode.MARKDOWN)
@@ -283,6 +283,7 @@ def project_team(update: Update, context: CallbackContext) -> None:
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text("Please confirm project details.", reply_markup=reply_markup)
+    bot.sendMessage("YES")
     return PROJECT_CONFIRM
 
 
