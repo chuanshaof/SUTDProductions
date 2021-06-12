@@ -278,8 +278,8 @@ def project_team(update: Update, context: CallbackContext) -> None:
                     text=view_projects(temp_project),
                     parse_mode=ParseMode.MARKDOWN)
 
-    keyboard = [[InlineKeyboardButton("Yes", callback_data="Y")],
-                [InlineKeyboardButton("No", callback_data="N")]]
+    keyboard = [[InlineKeyboardButton("Yes", callback_data="Yes")],
+                [InlineKeyboardButton("No", callback_data="No")]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text("Please confirm project details.", reply_markup=reply_markup)
@@ -291,7 +291,7 @@ def project_team(update: Update, context: CallbackContext) -> None:
 def project_confirm(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
-    if query.data == "Y":
+    if query.data == "Yes":
         query.edit_message_text(f"Successfully added {temp_project[0]}.")
         context.bot_data["projects"].append(temp_project.copy())
         temp_project.clear()
