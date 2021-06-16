@@ -775,7 +775,7 @@ def main():
         states={
             START: [CallbackQueryHandler(start_query)]
         },
-        fallbacks=[MessageHandler(Filters.command, cancel)]
+        fallbacks=[MessageHandler(Filters.command, start)]
     ))
 
     # Remove handler
