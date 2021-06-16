@@ -776,7 +776,7 @@ def main():
         states={
             START: [CallbackQueryHandler(start_query)]
         },
-        fallbacks=[CommandHandler("cancel", cancel)]
+        fallbacks=[MessageHandler(Filters.command, cancel)]
     ))
 
     # Remove handler
@@ -831,7 +831,7 @@ def main():
             PROJECT_TEAM: [MessageHandler(Filters.text, project_team)],
             PROJECT_CONFIRM: [CallbackQueryHandler(project_confirm)]
         },
-        fallbacks=[]
+        fallbacks=[MessageHandler(Filters.command, cancel)]
     ))
 
     # Announce handler
