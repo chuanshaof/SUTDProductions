@@ -6,6 +6,12 @@ import logging
 
 import os
 
+"""
+git add .
+git commit -m "changing python3 to python in Procfile"
+git push heroku master
+"""
+
 WAIT_CODE, PROJECT_NAME, PROJECT_DESCRIPTION, PROJECT_POC, PROJECT_VENUE, PROJECT_PARTNERS, PROJECT_INSPIRATION, \
 PROJECT_ROLES, PROJECT_DEADLINE, PROJECT_REQUIREMENTS, PROJECT_TEAM, PROJECT_CONFIRM, LIST_PROJECTS, SOCIALS, \
 SUBSCRIBE, UNSUBSCRIBE, ANNOUNCE, START, REMOVE, EDIT, EDIT_CONFIRM = range(21)
@@ -674,10 +680,8 @@ def clear_admins(update: Update, context: CallbackContext) -> None:
 
 # Cancel action
 def cancel(update: Update, context: CallbackContext) -> None:
-    bot.sendMessage(chat_id=update.message.chat_id, text="*bold* _italic_ [link](https://google.com).",
-                    parse_mode=ParseMode.MARKDOWN)
     update.message.reply_text("Action cancelled.")
-    return
+    return ConversationHandler.END
 
 
 # Check subscribed members
@@ -773,7 +777,7 @@ def main():
         states={
             START: [CallbackQueryHandler(start_query)]
         },
-        fallbacks=[]
+        fallbacks=[CommandHandler("cancel", cancel)]
     ))
 
     # Remove handler
