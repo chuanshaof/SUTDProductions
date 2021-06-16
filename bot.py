@@ -680,7 +680,6 @@ def clear_admins(update: Update, context: CallbackContext) -> None:
 
 # Cancel action
 def cancel(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text("Action cancelled.")
     return ConversationHandler.END
 
 
