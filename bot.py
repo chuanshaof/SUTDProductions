@@ -557,7 +557,6 @@ def edit_query(update: Update, context: CallbackContext) -> None:
 
 # Editing confirmation
 def edit_confirmation(update: Update, context: CallbackContext) -> None:
-
     # Each here is the list of items
     for each in context.bot_data["projects"]:
         keyboard = [[InlineKeyboardButton("Confirm Edit", callback_data="confirm" + temp_edit + update.message.text)],
@@ -775,7 +774,8 @@ def main():
         states={
             START: [CallbackQueryHandler(start_query)]
         },
-        fallbacks=[MessageHandler(Filters.command, start)]
+        fallbacks=[],
+        allow_reentry=True
     ))
 
     # Remove handler
@@ -818,19 +818,20 @@ def main():
             CommandHandler("add", add)
         ],
         states={
-            PROJECT_NAME: [MessageHandler(Filters.text, project_name)],
-            PROJECT_DESCRIPTION: [MessageHandler(Filters.text, project_description)],
-            PROJECT_POC: [MessageHandler(Filters.text, project_poc)],
-            PROJECT_VENUE: [MessageHandler(Filters.text, project_venue)],
-            PROJECT_PARTNERS: [MessageHandler(Filters.text, project_partners)],
-            PROJECT_INSPIRATION: [MessageHandler(Filters.text, project_inspiration)],
-            PROJECT_ROLES: [MessageHandler(Filters.text, project_roles)],
-            PROJECT_DEADLINE: [MessageHandler(Filters.text, project_deadline)],
-            PROJECT_REQUIREMENTS: [MessageHandler(Filters.text, project_requirement)],
-            PROJECT_TEAM: [MessageHandler(Filters.text, project_team)],
+            PROJECT_NAME: [MessageHandler(Filters.text & (~ Filters.command), project_name)],
+            PROJECT_DESCRIPTION: [MessageHandler(Filters.text & (~ Filters.command), project_description)],
+            PROJECT_POC: [MessageHandler(Filters.text & (~ Filters.command), project_poc)],
+            PROJECT_VENUE: [MessageHandler(Filters.text & (~ Filters.command), project_venue)],
+            PROJECT_PARTNERS: [MessageHandler(Filters.text & (~ Filters.command), project_partners)],
+            PROJECT_INSPIRATION: [MessageHandler(Filters.text & (~ Filters.command), project_inspiration)],
+            PROJECT_ROLES: [MessageHandler(Filters.text & (~ Filters.command), project_roles)],
+            PROJECT_DEADLINE: [MessageHandler(Filters.text & (~ Filters.command), project_deadline)],
+            PROJECT_REQUIREMENTS: [MessageHandler(Filters.text & (~ Filters.command), project_requirement)],
+            PROJECT_TEAM: [MessageHandler(Filters.text & (~ Filters.command), project_team)],
             PROJECT_CONFIRM: [CallbackQueryHandler(project_confirm)]
         },
-        fallbacks=[MessageHandler(Filters.command, cancel)]
+        fallbacks=[MessageHandler(Filters.command, cancel)],
+        allow_reentry=True
     ))
 
     # Announce handler
@@ -857,6 +858,7 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
