@@ -765,7 +765,6 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("cancel", cancel))
     dp.add_handler(CommandHandler("clear_admins", clear_admins))
     dp.add_handler(CommandHandler("check_subs", check_subs))
 
