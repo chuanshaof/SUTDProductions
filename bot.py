@@ -18,10 +18,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-TOKEN = '1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E'
+TOKEN = '1682087004:AAE05A-vrAtvytUIEZzsaLlQyERUOn6Gs7s'
 my_persistence = PicklePersistence(filename='my_file')
 
-bot = Bot('1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E')
+bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
 
