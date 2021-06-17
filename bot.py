@@ -733,8 +733,9 @@ def announcement(update: Update, context: CallbackContext) -> None:
     if query.data == "Y":
         for each in context.bot_data["subscribe"]:
             forward_to = each[0]
-            bot.forwardMessage(chat_id=forward_to, from_chat_id=query.message.from_user.id,
-                               message_id=announce_message)
+            bot.sendMessage(chat_id=forward_to,
+                            message_id=announce_message,
+                            parse_mode=ParseMode.MARKDOWN)
         update.message.reply_text("Successfully announced to subscribers.")
         return ConversationHandler.END
 
