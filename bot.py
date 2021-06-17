@@ -644,7 +644,7 @@ def admin(update: Update, context: CallbackContext) -> int:
         context.bot_data["admin"] = list()
 
     if update.message.from_user.id in context.bot_data["admin"]:
-        update.message.reply_text("Already verified")
+        update.message.reply_text("Already verified, you can now use /add, /remove, /edit, and /announce.")
         return ConversationHandler.END
     else:
         update.message.reply_text("Enter the admin code")
@@ -798,7 +798,8 @@ def main():
             EDIT: [CallbackQueryHandler(edit_query)],
             EDIT_CONFIRM: [MessageHandler(Filters.text, edit_confirmation)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        allow_reentry=True
     ))
 
     # Admin handler
@@ -840,9 +841,10 @@ def main():
             CommandHandler("announce", announce)
         ],
         states={
-            ANNOUNCE: [MessageHandler(Filters.all, announcement)]
+            ANNOUNCE: [MessageHandler(Filters.all & (~ Filters.command), announcement)]
         },
-        fallbacks=[]
+        fallbacks=[],
+        allow_reentry=True
     ))
 
     # log all errors
