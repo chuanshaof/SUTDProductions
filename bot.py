@@ -727,7 +727,7 @@ def announcement_confirm(update: Update, context: CallbackContext) -> None:
 
 def announcement(update: Update, context: CallbackContext) -> None:
     bot.sendMessage(chat_id="229599548",
-                    text="working?")
+                    text=announce_message)
     query = update.callback_query
 
     if query.data == "Y":
