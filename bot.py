@@ -866,7 +866,7 @@ def main():
         ],
         states={
             ANNOUNCE_QUERY: [MessageHandler(Filters.all & (~ Filters.command), announcement_confirm)],
-            ANNOUNCE: [MessageHandler(Filters.all & (~ Filters.command), announcement)]
+            ANNOUNCE: [CallbackQueryHandler(announcement)]
         },
         fallbacks=[],
         allow_reentry=True
