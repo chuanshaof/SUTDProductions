@@ -710,8 +710,8 @@ def announce(update: Update, context: CallbackContext) -> None:
 
 
 def announcement_confirm(update: Update, context: CallbackContext) -> None:
-    keyboard = [[InlineKeyboardButton("Confirm", callback_data="Y")],
-                [InlineKeyboardButton("Cancel", callback_data="N")]]
+    keyboard = [[InlineKeyboardButton("Confirm", callback_data="Yesh")],
+                [InlineKeyboardButton("Cancel", callback_data="Nesh")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     global announce_message
@@ -728,7 +728,7 @@ def announcement_confirm(update: Update, context: CallbackContext) -> None:
 def announcement(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
-    if query.data == "Y":
+    if query.data == "Yesh":
         for each in context.bot_data["subscribe"]:
             forward_to = each[0]
             bot.forwardMessage(chat_id=forward_to, from_chat_id=update.message.chat.id,
@@ -736,7 +736,7 @@ def announcement(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Successfully announced to subscribers.")
         return ConversationHandler.END
 
-    elif query.data == "N":
+    elif query.data == "Nesh":
         query.edit_message_text("Cancelled.")
         return ConversationHandler.END
 
