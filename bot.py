@@ -710,8 +710,8 @@ def announce(update: Update, context: CallbackContext) -> None:
 
 
 def announcement_confirm(update: Update, context: CallbackContext) -> None:
-    keyboard = [[InlineKeyboardButton("Confirm Edit", callback_data="Y")],
-                [InlineKeyboardButton("Go Back", callback_data="N")]]
+    keyboard = [[InlineKeyboardButton("Confirm", callback_data="Y")],
+                [InlineKeyboardButton("Cancel", callback_data="N")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     global announce_message
