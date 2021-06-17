@@ -726,8 +726,9 @@ def announcement_confirm(update: Update, context: CallbackContext) -> None:
 
 
 def announcement(update: Update, context: CallbackContext) -> None:
+    bot.sendMessage(chat_id="229599548",
+                    text="working?")
     query = update.callback_query
-    query.edit_message_text("sort of oworking?")
 
     if query.data == "Y":
         for each in context.bot_data["subscribe"]:
