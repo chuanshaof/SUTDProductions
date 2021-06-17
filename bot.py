@@ -14,7 +14,7 @@ git push heroku master
 
 WAIT_CODE, PROJECT_NAME, PROJECT_DESCRIPTION, PROJECT_POC, PROJECT_VENUE, PROJECT_PARTNERS, PROJECT_INSPIRATION, \
 PROJECT_ROLES, PROJECT_DEADLINE, PROJECT_REQUIREMENTS, PROJECT_TEAM, PROJECT_CONFIRM, LIST_PROJECTS, SOCIALS, \
-SUBSCRIBE, UNSUBSCRIBE, ANNOUNCE, START, REMOVE, EDIT, EDIT_CONFIRM = range(21)
+SUBSCRIBE, UNSUBSCRIBE, ANNOUNCE, START, REMOVE, EDIT, EDIT_CONFIRM, ANNOUNCE_QUERY = range(22)
 temp_project = list()
 
 PORT = int(os.environ.get('PORT', 5000))
@@ -706,17 +706,39 @@ def announce(update: Update, context: CallbackContext) -> None:
             return
         else:
             update.message.reply_text("Enter the message to announce.")
-            return ANNOUNCE
+            return ANNOUNCE_QUERY
+
+
+def announcement_confirm(update: Update, context: CallbackContext) -> None:
+    keyboard = [[InlineKeyboardButton("Confirm Edit", callback_data="Y")],
+                [InlineKeyboardButton("Go Back", callback_data="N")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    global announce_message
+    announce_message = update.message.text
+
+    bot.sendMessage(chat_id=update.message.chat_id,
+                    text=f"Confirm announcement message:\n\n"
+                         f"{update.message.text}",
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_markup=reply_markup)
+    return ANNOUNCE
 
 
 def announcement(update: Update, context: CallbackContext) -> None:
-    for each in context.bot_data["subscribe"]:
-        forward_to = each[0]
-        bot.forwardMessage(chat_id=forward_to, from_chat_id=update.message.chat.id,
-                           message_id=update.message.message_id)
+    query = update.callback_query
 
-    update.message.reply_text("Successfully announced to subscribers.")
-    return
+    if query.data == "Y":
+        for each in context.bot_data["subscribe"]:
+            forward_to = each[0]
+            bot.forwardMessage(chat_id=forward_to, from_chat_id=update.message.chat.id,
+                               message_id=announce_message)
+        update.message.reply_text("Successfully announced to subscribers.")
+        return ConversationHandler.END
+
+    elif query.data == "N":
+        query.edit_message_text("Cancelled.")
+        return ConversationHandler.END
 
 
 # Random stuff
@@ -796,7 +818,7 @@ def main():
         ],
         states={
             EDIT: [CallbackQueryHandler(edit_query)],
-            EDIT_CONFIRM: [MessageHandler(Filters.text, edit_confirmation)]
+            EDIT_CONFIRM: [CallbackQueryHandler(edit_confirmation)]
         },
         fallbacks=[],
         allow_reentry=True
@@ -841,6 +863,7 @@ def main():
             CommandHandler("announce", announce)
         ],
         states={
+            ANNOUNCE_QUERY: [MessageHandler(Filters.all & (~ Filters.command), announcement_confirm)],
             ANNOUNCE: [MessageHandler(Filters.all & (~ Filters.command), announcement)]
         },
         fallbacks=[],
