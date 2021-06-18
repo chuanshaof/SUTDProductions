@@ -734,9 +734,11 @@ def announcement(update: Update, context: CallbackContext) -> None:
             bot.sendMessage(chat_id=forward_to,
                             text=forward_to,
                             parse_mode=ParseMode.MARKDOWN)
+            bot.forwardMessage(chat_id=query.message.chat_id,
+                               message_id=query.message.message_id,
+                               text=announce_message)
         query.edit_message_text("Successfully announced to subscribers.")
         return ConversationHandler.END
-    #bot.forwardMessage(chat_id=forward_to, from_chat_id=update.message.chat.id, message_id=update.message.message_id)
     elif query.data == "N":
         query.edit_message_text("Cancelled.")
         return ConversationHandler.END
