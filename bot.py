@@ -727,12 +727,15 @@ def announcement_confirm(update: Update, context: CallbackContext) -> None:
 
 def announcement(update: Update, context: CallbackContext) -> None:
     bot.sendMessage(chat_id="229599548",
-                    text=announce_message)
+                    text=announce_message,
+                    parse_mode=ParseMode.MARKDOWN)
     query = update.callback_query
 
     if query.data == "Y":
         for each in context.bot_data["subscribe"]:
             forward_to = each[0]
+            bot.sendMessage(chat_id="229599548",
+                            text=str(forward_to))
             bot.sendMessage(chat_id=str(forward_to),
                             message_id=announce_message,
                             parse_mode=ParseMode.MARKDOWN)
