@@ -8,12 +8,6 @@ import logging
 
 import os
 
-"""
-git add .
-git commit -m "changing python3 to python in Procfile"
-git push heroku master
-"""
-
 WAIT_CODE, PROJECT_NAME, PROJECT_DESCRIPTION, PROJECT_POC, PROJECT_VENUE, PROJECT_PARTNERS, PROJECT_INSPIRATION, \
 PROJECT_ROLES, PROJECT_DEADLINE, PROJECT_REQUIREMENTS, PROJECT_TEAM, PROJECT_CONFIRM, LIST_PROJECTS, SOCIALS, \
 SUBSCRIBE, UNSUBSCRIBE, ANNOUNCE, START, REMOVE, EDIT, EDIT_CONFIRM, ANNOUNCE_QUERY = range(22)
@@ -32,6 +26,11 @@ TOKEN = '1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E'
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
+"""
+git add .
+git commit -m "changing python3 to python in Procfile"
+git push heroku master
+"""
 
 # User Interface
 # ---------------------------------------------------------------------------------------------#
@@ -788,7 +787,7 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("clear_admins", clear_admins))
-    dp.add_handler(CommandHandler("check_subs", check_subs.check_subs()))
+    # dp.add_handler(CommandHandler("check_subs", check_subs.check_subs()))
 
     # Start handler
     dp.add_handler(ConversationHandler(
