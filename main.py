@@ -2,11 +2,15 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-import check_subs
-
 import logging
 
 import os
+
+"""
+git add .
+git commit -m "changing python3 to python in Procfile"
+git push heroku master
+"""
 
 WAIT_CODE, PROJECT_NAME, PROJECT_DESCRIPTION, PROJECT_POC, PROJECT_VENUE, PROJECT_PARTNERS, PROJECT_INSPIRATION, \
 PROJECT_ROLES, PROJECT_DEADLINE, PROJECT_REQUIREMENTS, PROJECT_TEAM, PROJECT_CONFIRM, LIST_PROJECTS, SOCIALS, \
@@ -20,17 +24,12 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+TOKEN = '1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E'
 my_persistence = PicklePersistence(filename='my_file')
 
-TOKEN = '1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E'
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
-"""
-git add .
-git commit -m "changing python3 to python in Procfile"
-git push heroku master
-"""
 
 # User Interface
 # ---------------------------------------------------------------------------------------------#
@@ -683,10 +682,10 @@ def cancel(update: Update, context: CallbackContext) -> None:
     return ConversationHandler.END
 
 
-# # Check subscribed members
-# def check_subs(update: Update, context: CallbackContext) -> None:
-#     update.message.reply_text(context.bot_data["subscribe"])
-#     return
+# Check subscribed members
+def check_subs(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(context.bot_data["subscribe"])
+    return
 
 
 # Announcement
@@ -787,7 +786,7 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("clear_admins", clear_admins))
-    # dp.add_handler(CommandHandler("check_subs", check_subs.check_subs()))
+    dp.add_handler(CommandHandler("check_subs", check_subs))
 
     # Start handler
     dp.add_handler(ConversationHandler(
