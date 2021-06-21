@@ -788,7 +788,7 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("clear_admins", clear_admins))
-    dp.add_handler(CommandHandler("check_subs", check_subs.check_subs))
+    dp.add_handler(CommandHandler("check_subs", check_subs.check_subs()))
 
     # Start handler
     dp.add_handler(ConversationHandler(
