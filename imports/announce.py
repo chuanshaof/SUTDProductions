@@ -2,8 +2,11 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-TOKEN = '1544769823:AAFJK_Md3EV8AMWHJG4i9Qaxe_LhCP6Jb5E'
+TOKEN = '1544769823:AAEKdAMDlPKuxL30_QuHmM8Am1OZoNep24s'
 bot = Bot(TOKEN)
+dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
+
+ANNOUNCE_QUERY, ANNOUNCE = range(2)
 
 def announce(update: Update, context: CallbackContext) -> None:
     if "admin" not in context.bot_data:
