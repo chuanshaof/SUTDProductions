@@ -2,11 +2,13 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-TOKEN = '1544769823:AAEKdAMDlPKuxL30_QuHmM8Am1OZoNep24s'
+from imports.bits import view_projects
+from imports import globals
+
+TOKEN = '1544769823:AAHU5H9ycnb9Wad9wCFgRVCh7CPoLW_i72s'
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
-EDIT, EDIT_CONFIRM = range(2)
 
 # Editing projects
 # ---------------------------------------------------------------------------------------------#
@@ -22,16 +24,16 @@ def edit(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Sorry, there are no projects at the moment!")
         return
 
-    projects = format_project_list(update, context)
     keyboard = list()
-    for each in projects:
-        project = InlineKeyboardButton(each, callback_data=each)
+    for each in context.bot_data["projects"]:
+        project = InlineKeyboardButton(each[0], callback_data=each[0])
         keyboard.append([project])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text('Click on the title of the project you would like to edit.',
+    update.message.reply_text('<b>Click on the title of the project you would like to edit.</b>',
+                              parse_mode=ParseMode.HTML,
                               reply_markup=reply_markup)
-    return EDIT
+    return globals.EDIT
 
 
 # Remove project (CONFIRM)
@@ -42,10 +44,9 @@ def edit_query(update: Update, context: CallbackContext) -> None:
     temp_edit = query.data
 
     if query.data == "return":
-        projects = format_project_list(update, context)
         keyboard = list()
-        for each in projects:
-            project = InlineKeyboardButton(each, callback_data=each)
+        for each in context.bot_data["projects]"]:
+            project = InlineKeyboardButton(each[0], callback_data=each[0])
             keyboard.append([project])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -69,67 +70,67 @@ def edit_query(update: Update, context: CallbackContext) -> None:
 
             reply_markup = InlineKeyboardMarkup(keyboard)
 
-            query.edit_message_text(f"*Click on the details that you would like to edit.*\n\n"
+            query.edit_message_text(f"<b>Click on the details that you would like to edit.</b>\n\n"
                                     f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN,
+                                    parse_mode=ParseMode.HTML,
                                     reply_markup=reply_markup)
 
         elif query.data == "name" + each[0]:
             query.edit_message_text(f"Enter the new project name.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "description" + each[0]:
             query.edit_message_text(f"Enter the new project description.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "poc" + each[0]:
             query.edit_message_text(f"Enter the new project POC.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "venue" + each[0]:
             query.edit_message_text(f"Enter the new project venue.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "partners" + each[0]:
             query.edit_message_text(f"Enter the new project partners.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "inspiration" + each[0]:
             query.edit_message_text(f"Enter the new project inspiration.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "roles" + each[0]:
             query.edit_message_text(f"Enter the new project required roles.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "deadline" + each[0]:
             query.edit_message_text(f"Enter the new project deadline.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "requirements" + each[0]:
             query.edit_message_text(f"Enter the new project requirements.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif query.data == "team" + each[0]:
             query.edit_message_text(f"Enter the new project team.",
-                                    parse_mode=ParseMode.MARKDOWN)
-            return EDIT_CONFIRM
+                                    parse_mode=ParseMode.HTML)
+            return globals.EDIT_CONFIRM
 
         elif "confirm" + "name" + each[0] in query.data:
             length = len("confirm" + "name" + each[0])
             each[0] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "description" + each[0] in query.data:
@@ -137,7 +138,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[1] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "poc" + each[0] in query.data:
@@ -145,7 +146,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[2] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "venue" + each[0] in query.data:
@@ -153,7 +154,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[3] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "partners" + each[0] in query.data:
@@ -161,7 +162,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[4] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "inspiration" + each[0] in query.data:
@@ -169,7 +170,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[5] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "roles" + each[0] in query.data:
@@ -177,7 +178,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[6] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "deadline" + each[0] in query.data:
@@ -185,7 +186,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[7] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "requirements" + each[0] in query.data:
@@ -193,7 +194,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[8] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
         elif "confirm" + "team" + each[0] in query.data:
@@ -201,7 +202,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
             each[9] = query.data[length:]
             query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                          f"{view_projects(each)}",
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
 
@@ -215,98 +216,77 @@ def edit_confirmation(update: Update, context: CallbackContext) -> None:
         temp_proj = each.copy()
 
         if temp_edit == "name" + each[0]:
-            temp_proj[0] = update.message.text
-            bot.sendMessage(chat_id=update.message.chat_id,
-                            text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
-                            reply_markup=reply_markup)
+            for each in context.bot_data["projects"]:
+                if update.message.text == each[0]:
+                    update.message.reply_text("Project name has been taken, please key in a new project name.")
+                    return globals.EDIT_CONFIRM
+            else:
+                temp_proj[0] = update.message.text
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text=f"{view_projects(temp_proj)}",
+                                parse_mode=ParseMode.HTML,
+                                reply_markup=reply_markup)
 
         elif temp_edit == "description" + each[0]:
             temp_proj[1] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "poc" + each[0]:
             temp_proj[2] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "venue" + each[0]:
             temp_proj[3] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "partners" + each[0]:
             temp_proj[4] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "inspiration" + each[0]:
             temp_proj[5] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "roles" + each[0]:
             temp_proj[6] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "deadline" + each[0]:
             temp_proj[7] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "requirements" + each[0]:
             temp_proj[8] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
 
         elif temp_edit == "team" + each[0]:
             temp_proj[9] = update.message.text
             bot.sendMessage(chat_id=update.message.chat_id,
                             text=f"{view_projects(temp_proj)}",
-                            parse_mode=ParseMode.MARKDOWN,
+                            parse_mode=ParseMode.HTML,
                             reply_markup=reply_markup)
-    return EDIT
-
-
-# Returns a list, used in multiple places
-def format_project_list(update: Update, context: CallbackContext) -> list:
-    if "projects" not in context.bot_data:
-        context.bot_data["projects"] = list()
-        return list()
-    list_of_names = list()
-    for each in context.bot_data["projects"]:
-        list_of_names.append(each[0])
-    return list_of_names
-
-
-# Returns a formatted string, used in multiple places
-def view_projects(project: list) -> str:
-    view_proj = f"*{project[0]}*\n" \
-                f"_{project[1]}_\n" \
-                f"POC: @{project[2]}\n" \
-                f"Venue: {project[3]}\n" \
-                f"Partners: {project[4]}\n" \
-                f"Inspiration: [{project[5]}]({project[5]})\n" \
-                f"Roles needed: {project[6]}\n" \
-                f"Production Deadline: {project[7]}\n" \
-                f"Project Requirement: {project[8]}\n" \
-                f"Team: {project[9]}\n"
-    return view_proj
+    return globals.EDIT

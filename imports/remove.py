@@ -2,7 +2,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-REMOVE = range(1)
+from imports.bits import view_projects
+from imports import globals
 
 
 # Removing projects
@@ -28,7 +29,7 @@ def remove(update: Update, context: CallbackContext) -> None:
 
             reply_markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text("Please select the project name you want to remove.", reply_markup=reply_markup)
-            return REMOVE
+            return globals.REMOVE
 
 
 # Remove project (CONFIRM)
@@ -46,7 +47,7 @@ def remove_confirm(update: Update, context: CallbackContext) -> None:
             query.edit_message_text(f"{view_projects(each)}\n"
                                     f"Please confirm project removal.",
                                     reply_markup=reply_markup,
-                                    parse_mode=ParseMode.MARKDOWN)
+                                    parse_mode=ParseMode.HTML)
         if query.data == "Y":
             query.edit_message_text(f"{each[0]} has been successfully removed.")
             context.bot_data["projects"].remove(each)
@@ -67,18 +68,3 @@ def format_project_list(update: Update, context: CallbackContext) -> list:
     for each in context.bot_data["projects"]:
         list_of_names.append(each[0])
     return list_of_names
-
-
-# Returns a formatted string, used in multiple places
-def view_projects(project: list) -> str:
-    view_proj = f"*{project[0]}*\n" \
-                f"_{project[1]}_\n" \
-                f"POC: @{project[2]}\n" \
-                f"Venue: {project[3]}\n" \
-                f"Partners: {project[4]}\n" \
-                f"Inspiration: [{project[5]}]({project[5]})\n" \
-                f"Roles needed: {project[6]}\n" \
-                f"Production Deadline: {project[7]}\n" \
-                f"Project Requirement: {project[8]}\n" \
-                f"Team: {project[9]}\n"
-    return view_proj

@@ -2,11 +2,12 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-TOKEN = '1544769823:AAEKdAMDlPKuxL30_QuHmM8Am1OZoNep24s'
+from imports.bits import view_projects
+from imports import globals
+
+TOKEN = '1544769823:AAHU5H9ycnb9Wad9wCFgRVCh7CPoLW_i72s'
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
-
-VIEW_PROJECTS = range(1)
 
 
 def view_project(update: Update, context: CallbackContext) -> int:
@@ -23,7 +24,7 @@ def view_project(update: Update, context: CallbackContext) -> int:
         update.message.reply_text('To view more details of each project, click on the title.',
                                   reply_markup=reply_markup)
 
-    return VIEW_PROJECTS
+    return globals.VIEW_PROJECTS
 
 
 def view_project_query(update: Update, context: CallbackContext) -> None:
@@ -48,32 +49,25 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             query.edit_message_text(view_projects(each),
-                                    parse_mode=ParseMode.MARKDOWN,
+                                    parse_mode=ParseMode.HTML,
                                     reply_markup=reply_markup)
 
         if query.data == "join" + each[0]:
             HAORON = 255414224
             CS = 229599548
+            NOAH = 262240949
+            username = query.from_user.username.replace("_", "\_")
             bot.sendMessage(chat_id=CS,
-                            text=f"Hi Haoron, @{query.from_user.username} has signed up for the following project.\n\n"
+                            text=f"Hi, @{username} has signed up for the following project.\n\n"
                                  f"{view_projects(each)}",
-                            parse_mode=ParseMode.MARKDOWN)
+                            parse_mode=ParseMode.HTML)
+            bot.sendMessage(chat_id=NOAH,
+                            text=f"Hi, @{username} has signed up for the following project.\n\n"
+                                 f"{view_projects(each)}",
+                            parse_mode=ParseMode.HTML)
 
             query.edit_message_text("Thank you for signing up!\n"
-                                    "Your interest has been indicated and we will be getting back to you shortly.")
+                                    "Your interest has been noted and we will be getting back to you shortly.")
+
+            each[9].append(query.from_user.username)
             return ConversationHandler.END
-
-
-# Returns a formatted string, used in multiple places
-def view_projects(project: list) -> str:
-    view_proj = f"*{project[0]}*\n" \
-                f"_{project[1]}_\n" \
-                f"POC: @{project[2]}\n" \
-                f"Venue: {project[3]}\n" \
-                f"Partners: {project[4]}\n" \
-                f"Inspiration: [{project[5]}]({project[5]})\n" \
-                f"Roles needed: {project[6]}\n" \
-                f"Production Deadline: {project[7]}\n" \
-                f"Project Requirement: {project[8]}\n" \
-                f"Team: {project[9]}\n"
-    return view_proj

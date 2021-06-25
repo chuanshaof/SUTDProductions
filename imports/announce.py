@@ -2,11 +2,12 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-TOKEN = '1544769823:AAEKdAMDlPKuxL30_QuHmM8Am1OZoNep24s'
+from imports import globals
+
+TOKEN = '1544769823:AAHU5H9ycnb9Wad9wCFgRVCh7CPoLW_i72s'
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
-ANNOUNCE_QUERY, ANNOUNCE = range(2)
 
 def announce(update: Update, context: CallbackContext) -> None:
     if "admin" not in context.bot_data:
@@ -24,7 +25,7 @@ def announce(update: Update, context: CallbackContext) -> None:
             return
         else:
             update.message.reply_text("Enter the message to announce.")
-            return ANNOUNCE_QUERY
+            return globals.ANNOUNCE_QUERY
 
 
 def announcement_confirm(update: Update, context: CallbackContext) -> None:
@@ -38,9 +39,9 @@ def announcement_confirm(update: Update, context: CallbackContext) -> None:
     bot.sendMessage(chat_id=update.message.chat_id,
                     text=f"Confirm announcement message:\n\n"
                          f"{update.message.text}",
-                    parse_mode=ParseMode.MARKDOWN,
+                    parse_mode=ParseMode.HTML,
                     reply_markup=reply_markup)
-    return ANNOUNCE
+    return globals.ANNOUNCE
 
 
 def announcement(update: Update, context: CallbackContext) -> None:
@@ -51,7 +52,7 @@ def announcement(update: Update, context: CallbackContext) -> None:
             forward_to = str(each[0])
             bot.sendMessage(chat_id=forward_to,
                             text=announce_message,
-                            parse_mode=ParseMode.MARKDOWN)
+                            parse_mode=ParseMode.HTML)
         query.edit_message_text("Successfully announced to subscribers.")
         return ConversationHandler.END
     elif query.data == "N":

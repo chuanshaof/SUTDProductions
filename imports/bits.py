@@ -23,3 +23,18 @@ def clear_admins(update: Update, context: CallbackContext) -> None:
     else:
         context.bot_data["admin"].clear()
         update.message.reply_text("Admin list cleared.")
+
+
+# Returns a formatted string, used in multiple places
+def view_projects(project: list) -> str:
+    view_proj = f"<b>{project[0]}</b>\n" \
+                f"<i>{project[1]}</i>\n" \
+                f"POC: @{project[2]}\n" \
+                f"Venue: {project[3]}\n" \
+                f"Partners: {project[4]}\n" \
+                f"Inspiration: {project[5]}\n" \
+                f"Roles needed: {project[6]}\n" \
+                f"Production Deadline: {project[7]}\n" \
+                f"Project Requirement: {project[8]}\n" \
+                f"Team: {project[9]}\n"
+    return view_proj
