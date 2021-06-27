@@ -32,7 +32,7 @@ def add(update: Update, context: CallbackContext) -> int:
 
 # Adding Projects (TITLE)
 def project_name(update: Update, context: CallbackContext) -> int:
-    if not update.message.text or len(update.message.text) > 50:
+    if not update.message.text or len(update.message.text) > 50 or "\n" in update.message.text:
         update.message.reply_text("Please enter a valid project name.")
         return globals.PROJECT_NAME
 

@@ -79,10 +79,15 @@ def main():
 
     admin_states = {
         globals.WAIT_CODE:
-            [MessageHandler(Filters.text, admin.verify)]
+            [MessageHandler(Filters.text & (~ Filters.command), admin.verify)]
     }
 
-    state_1 = {**add_states, **edit_states, **announce_states, **admin_states}
+    block_add_states = {
+        globals.BLOCK_ADD:
+            [MessageHandler(Filters.text & (~ Filters.command), block_add.confirm)]
+    }
+
+    state_1 = {**add_states, **edit_states, **announce_states, **admin_states, **block_add_states}
 
     state_2 = {
             globals.START: [CallbackQueryHandler(start.start_query)],
@@ -115,13 +120,13 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    updater.start_polling()
+    # updater.start_polling()
 
     # # Start the Bot
-    # updater.start_webhook(listen="0.0.0.0",
-    #                       port=int(PORT),
-    #                       url_path=TOKEN)
-    # updater.bot.setWebhook('https://boiling-badlands-67618.herokuapp.com/' + TOKEN)
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook('https://boiling-badlands-67618.herokuapp.com/' + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
