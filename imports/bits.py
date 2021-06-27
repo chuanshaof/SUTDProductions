@@ -29,9 +29,9 @@ def clear_admins(update: Update, context: CallbackContext) -> None:
 def view_projects(project: list) -> str:
     view_proj = f"<b>{project[0]}</b>\n" \
                 f"<i>{project[1]}</i>\n" \
-                f"POC: @{project[2]}\n" \
+                f"POC: {project[2]}\n" \
                 f"Venue: {project[3]}\n" \
-                f"Partners: {project[4]}\n" \
+                f"Project Purpose: {project[4]}\n" \
                 f"Inspiration: {project[5]}\n" \
                 f"Roles needed: {project[6]}\n" \
                 f"Production Deadline: {project[7]}\n" \

@@ -20,11 +20,10 @@ def remove(update: Update, context: CallbackContext) -> None:
             update.message.reply_text("Sorry, there are no projects at the moment!")
             return
         else:
-            projects = format_project_list(update, context)
             keyboard = list()
 
-            for each in projects:
-                project = InlineKeyboardButton(each, callback_data=each)
+            for each in context.bot_data["projects"]:
+                project = InlineKeyboardButton(each[0], callback_data=each[0])
                 keyboard.append([project])
 
             reply_markup = InlineKeyboardMarkup(keyboard)
@@ -36,35 +35,22 @@ def remove(update: Update, context: CallbackContext) -> None:
 def remove_confirm(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
-    keyboard = [[InlineKeyboardButton("Yes", callback_data="Y")],
-                [InlineKeyboardButton("No", callback_data="N")]]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
     for each in context.bot_data["projects"]:
         # Each[0] represents the name
         if query.data == each[0]:
+            keyboard = [[InlineKeyboardButton("Yes", callback_data="Y" + each[0])],
+                        [InlineKeyboardButton("No", callback_data="N" + each[0])]]
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
             query.edit_message_text(f"{view_projects(each)}\n"
                                     f"Please confirm project removal.",
                                     reply_markup=reply_markup,
                                     parse_mode=ParseMode.HTML)
-        if query.data == "Y":
+        if query.data == "Y" + each[0]:
             query.edit_message_text(f"{each[0]} has been successfully removed.")
             context.bot_data["projects"].remove(each)
             return ConversationHandler.END
-        elif query.data == "N":
+        elif query.data == "N" + each[0]:
             query.edit_message_text("Cancelled.")
             return ConversationHandler.END
-
-
-# Random stuff
-# ---------------------------------------------------------------------------------------------#
-# Returns a list, used in multiple places
-def format_project_list(update: Update, context: CallbackContext) -> list:
-    if "projects" not in context.bot_data:
-        context.bot_data["projects"] = list()
-        return list()
-    list_of_names = list()
-    for each in context.bot_data["projects"]:
-        list_of_names.append(each[0])
-    return list_of_names

@@ -2,9 +2,11 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
+import os
+
 from imports import globals
 
-TOKEN = '1544769823:AAHU5H9ycnb9Wad9wCFgRVCh7CPoLW_i72s'
+TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 

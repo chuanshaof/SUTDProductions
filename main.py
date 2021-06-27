@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-from imports import bits, subscribe, remove, edit, admin, announce, add, start, view_projects, globals
+from imports import bits, subscribe, remove, edit, admin, announce, add, start, view_projects, globals, block_add
 
 import logging
 
@@ -38,100 +38,77 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    # States
+    edit_states = {
+        globals.EDIT:
+            [CallbackQueryHandler(edit.edit_query)],
+        globals.EDIT_CONFIRM:
+            [MessageHandler(Filters.text & (~ Filters.command), edit.edit_confirmation)]
+    }
+
+    add_states = {
+        globals.PROJECT_NAME:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_name)],
+        globals.PROJECT_DESCRIPTION:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_description)],
+        globals.PROJECT_POC:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_poc)],
+        globals.PROJECT_VENUE:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_venue)],
+        globals.PROJECT_PURPOSE:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_purpose)],
+        globals.PROJECT_INSPIRATION:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_inspiration)],
+        globals.PROJECT_ROLES:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_roles)],
+        globals.PROJECT_DEADLINE:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_deadline)],
+        globals.PROJECT_REQUIREMENTS:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_requirement)],
+        globals.PROJECT_TEAM:
+            [MessageHandler(Filters.text & (~ Filters.command), add.project_team)],
+        globals.PROJECT_CONFIRM:
+            [CallbackQueryHandler(add.project_confirm)]}
+
+    announce_states = {
+        globals.ANNOUNCE_QUERY:
+            [MessageHandler(Filters.all & (~ Filters.command), announce.announcement_confirm)],
+        globals.ANNOUNCE:
+            [CallbackQueryHandler(announce.announcement)]
+    }
+
+    admin_states = {
+        globals.WAIT_CODE:
+            [MessageHandler(Filters.text, admin.verify)]
+    }
+
+    state_1 = {**add_states, **edit_states, **announce_states, **admin_states}
+
+    state_2 = {
+            globals.START: [CallbackQueryHandler(start.start_query)],
+            globals.VIEW_PROJECTS: [CallbackQueryHandler(view_projects.view_project_query)],
+            globals.REMOVE: [CallbackQueryHandler(remove.remove_confirm)]
+        }
+
+    all_states = {**state_1, **state_2}
+
     # Start handler
     dp.add_handler(ConversationHandler(
         entry_points=[
             CommandHandler("start", start.start),
             CommandHandler("subscribe", subscribe.subscribe),
             CommandHandler("check_subs", bits.check_subs),
-            CommandHandler("clear_admins", bits.clear_admins)
+            CommandHandler("clear_admins", bits.clear_admins),
+            CommandHandler("viewprojects", view_projects.view_project),
+            CommandHandler("remove", remove.remove),
+            CommandHandler("admin", admin.admin),
+            CommandHandler("edit", edit.edit),
+            CommandHandler("add", add.add),
+            CommandHandler("announce", announce.announce),
+            CommandHandler("block_add", block_add.block_add)
         ],
-        states={
-            globals.START: [CallbackQueryHandler(start.start_query)]
-        },
-        fallbacks=[],
-        allow_reentry=True
-    ))
-
-    dp.add_handler(ConversationHandler(
-        entry_points=[
-            CommandHandler("viewprojects", view_projects.view_project)
-        ],
-        states={
-            globals.VIEW_PROJECTS: [CallbackQueryHandler(view_projects.view_project_query)]
-        },
-        fallbacks=[],
-        allow_reentry=True
-    ))
-
-    # Remove handler
-    dp.add_handler(ConversationHandler(
-        entry_points=[
-            CommandHandler("remove", remove.remove)
-        ],
-        states={
-            globals.REMOVE: [CallbackQueryHandler(remove.remove_confirm)]
-        },
-        fallbacks=[],
-        allow_reentry=True
-    ))
-
-    # Admin handler
-    dp.add_handler(ConversationHandler(
-        entry_points=[
-            CommandHandler("admin", admin.admin)
-        ],
-        states={
-            globals.WAIT_CODE: [MessageHandler(Filters.text, admin.verify)]
-        },
-        fallbacks=[MessageHandler(Filters.command, cancel)]
-    ))
-
-    # Edit handler
-    dp.add_handler(ConversationHandler(
-        entry_points=[
-            CommandHandler("edit", edit.edit)
-        ],
-        states={
-            globals.EDIT: [CallbackQueryHandler(edit.edit_query)],
-            globals.EDIT_CONFIRM: [MessageHandler(Filters.text & (~ Filters.command), edit.edit_confirmation)]
-        },
-        fallbacks=[MessageHandler(Filters.command, cancel)],
-        allow_reentry=True
-    ))
-
-    # Adding project
-    dp.add_handler(ConversationHandler(
-        entry_points=[
-            CommandHandler("add", add.add)
-        ],
-        states={
-            globals.PROJECT_NAME: [MessageHandler(Filters.text & (~ Filters.command), add.project_name)],
-            globals.PROJECT_DESCRIPTION: [MessageHandler(Filters.text & (~ Filters.command), add.project_description)],
-            globals.PROJECT_POC: [MessageHandler(Filters.text & (~ Filters.command), add.project_poc)],
-            globals.PROJECT_VENUE: [MessageHandler(Filters.text & (~ Filters.command), add.project_venue)],
-            globals.PROJECT_PARTNERS: [MessageHandler(Filters.text & (~ Filters.command), add.project_partners)],
-            globals.PROJECT_INSPIRATION: [MessageHandler(Filters.text & (~ Filters.command), add.project_inspiration)],
-            globals.PROJECT_ROLES: [MessageHandler(Filters.text & (~ Filters.command), add.project_roles)],
-            globals.PROJECT_DEADLINE: [MessageHandler(Filters.text & (~ Filters.command), add.project_deadline)],
-            globals.PROJECT_REQUIREMENTS: [MessageHandler(Filters.text & (~ Filters.command), add.project_requirement)],
-            globals.PROJECT_TEAM: [MessageHandler(Filters.text & (~ Filters.command), add.project_team)],
-            globals.PROJECT_CONFIRM: [CallbackQueryHandler(add.project_confirm)]
-        },
-        fallbacks=[MessageHandler(Filters.command, cancel)],
-        allow_reentry=True
-    ))
-
-    # Announce handler
-    dp.add_handler(ConversationHandler(
-        entry_points=[
-            CommandHandler("announce", announce.announce)
-        ],
-        states={
-            globals.ANNOUNCE_QUERY: [MessageHandler(Filters.all & (~ Filters.command), announce.announcement_confirm)],
-            globals.ANNOUNCE: [CallbackQueryHandler(announce.announcement)]
-        },
-        fallbacks=[MessageHandler(Filters.command, cancel)],
+        states=all_states,
+        fallbacks=[CommandHandler("cancel", cancel)],
         allow_reentry=True
     ))
 

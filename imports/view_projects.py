@@ -2,10 +2,12 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
+import os
+
 from imports.bits import view_projects
 from imports import globals
 
-TOKEN = '1544769823:AAHU5H9ycnb9Wad9wCFgRVCh7CPoLW_i72s'
+TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
@@ -53,21 +55,30 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
                                     reply_markup=reply_markup)
 
         if query.data == "join" + each[0]:
-            HAORON = 255414224
-            CS = 229599548
-            NOAH = 262240949
-            username = query.from_user.username.replace("_", "\_")
-            bot.sendMessage(chat_id=CS,
-                            text=f"Hi, @{username} has signed up for the following project.\n\n"
-                                 f"{view_projects(each)}",
-                            parse_mode=ParseMode.HTML)
-            bot.sendMessage(chat_id=NOAH,
-                            text=f"Hi, @{username} has signed up for the following project.\n\n"
-                                 f"{view_projects(each)}",
-                            parse_mode=ParseMode.HTML)
+            if query.from_user.username in each[9]:
+                query.edit_message_text(f"You have already signed up for this project, "
+                                        f"please contact @haoron to check your join status.")
+                return ConversationHandler.END
+            else:
+                each[9] = each[9] + "\n@" + query.from_user.username
+                HAORON = 255414224
+                CS = 229599548
+                NOAH = 262240949
+                bot.sendMessage(chat_id=HAORON,
+                                text=f"Hi, @{query.from_user.username} has signed up for the following project.\n\n"
+                                     f"{view_projects(each)}",
+                                parse_mode=ParseMode.HTML)
+                bot.sendMessage(chat_id=CS,
+                                text=f"Hi, @{query.from_user.username} has signed up for the following project.\n\n"
+                                     f"{view_projects(each)}",
+                                parse_mode=ParseMode.HTML)
+                bot.sendMessage(chat_id=NOAH,
+                                text=f"Hi, @{query.from_user.username} has signed up for the following project.\n\n"
+                                     f"{view_projects(each)}",
+                                parse_mode=ParseMode.HTML)
 
-            query.edit_message_text("Thank you for signing up!\n"
-                                    "Your interest has been noted and we will be getting back to you shortly.")
+                each.append("\n" + query.from_user.username)
 
-            each[9].append(query.from_user.username)
-            return ConversationHandler.END
+                query.edit_message_text("Thank you for signing up!\n"
+                                        "Your interest has been noted and we will be getting back to you shortly.")
+                return ConversationHandler.END

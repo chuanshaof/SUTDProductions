@@ -2,14 +2,14 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
+import os
+
 from imports.bits import view_projects
 from imports import globals
 
-TOKEN = '1544769823:AAHU5H9ycnb9Wad9wCFgRVCh7CPoLW_i72s'
+TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
-
-temp_project = list()
 
 
 # Adding Projects
@@ -23,14 +23,16 @@ def add(update: Update, context: CallbackContext) -> int:
     else:
         if "projects" not in context.bot_data:
             context.bot_data["projects"] = list()
-        temp_project.clear()
-        update.message.reply_text("Please enter project name.")
+        if "temp_project" not in context.user_data:
+            context.user_data["temp_project"] = list()
+        context.user_data["temp_project"].clear()
+        update.message.reply_text("Please enter project name, maximum of 50 characters all in one line.")
         return globals.PROJECT_NAME
 
 
 # Adding Projects (TITLE)
 def project_name(update: Update, context: CallbackContext) -> int:
-    if not update.message.text:
+    if not update.message.text or len(update.message.text) > 50:
         update.message.reply_text("Please enter a valid project name.")
         return globals.PROJECT_NAME
 
@@ -39,7 +41,7 @@ def project_name(update: Update, context: CallbackContext) -> int:
             update.message.reply_text("Project name has been taken, please key in a new project name.")
             return globals.PROJECT_NAME
 
-    temp_project.append(update.message.text)
+    context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project description.")
     return globals.PROJECT_DESCRIPTION
@@ -51,7 +53,7 @@ def project_description(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Please enter a valid project description.")
         return globals.PROJECT_DESCRIPTION
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project POC.")
 
@@ -64,7 +66,7 @@ def project_poc(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Please enter a valid project POC.")
         return globals.PROJECT_POC
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project venue.")
 
@@ -77,20 +79,20 @@ def project_venue(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Please enter a valid project venue.")
         return globals.PROJECT_VENUE
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
-    update.message.reply_text("Please enter project partners.")
+    update.message.reply_text("Please enter project purpose.")
 
-    return globals.PROJECT_PARTNERS
+    return globals.PROJECT_PURPOSE
 
 
 # Adding Projects (DETAILS)
-def project_partners(update: Update, context: CallbackContext) -> None:
+def project_purpose(update: Update, context: CallbackContext) -> None:
     if not update.message.text:
-        update.message.reply_text("Please enter a valid project partner.")
-        return globals.PROJECT_PARTNERS
+        update.message.reply_text("Please enter a valid project purpose.")
+        return globals.PROJECT_PURPOSE
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project inspiration.")
 
@@ -103,7 +105,7 @@ def project_inspiration(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Please enter a valid project inspiration.")
         return globals.PROJECT_DESCRIPTION
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project roles.")
     return globals.PROJECT_ROLES
@@ -115,7 +117,7 @@ def project_roles(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Please enter a valid project roles.")
         return globals.PROJECT_ROLES
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project deadline.")
     return globals.PROJECT_DEADLINE
@@ -127,7 +129,7 @@ def project_deadline(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Please enter a valid project deadline.")
         return globals.PROJECT_DEADLINE
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project requirement.")
     return globals.PROJECT_REQUIREMENTS
@@ -139,7 +141,7 @@ def project_requirement(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Please enter a valid project requirement.")
         return globals.PROJECT_REQUIREMENTS
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     update.message.reply_text("Please enter project team.")
     return globals.PROJECT_TEAM
@@ -151,7 +153,7 @@ def project_team(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Please enter a valid project team.")
         return globals.PROJECT_TEAM
     else:
-        temp_project.append(update.message.text)
+        context.user_data["temp_project"].append(update.message.text)
 
     keyboard = [[InlineKeyboardButton("Yes", callback_data="Yes")],
                 [InlineKeyboardButton("No", callback_data="No")]]
@@ -160,7 +162,7 @@ def project_team(update: Update, context: CallbackContext) -> None:
 
     bot.sendMessage(chat_id=update.message.chat_id,
                     text="Please confirm project details.\n\n"
-                         + view_projects(temp_project),
+                         + view_projects(context.user_data["temp_project"]),
                     reply_markup=reply_markup,
                     parse_mode=ParseMode.HTML)
 
@@ -172,9 +174,9 @@ def project_confirm(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
     if query.data == "Yes":
-        query.edit_message_text(f"Successfully added {temp_project[0]}.")
-        context.bot_data["projects"].append(temp_project.copy())
-        temp_project.clear()
+        query.edit_message_text(f"Successfully added {context.user_data['temp_project'][0]}.")
+        context.bot_data["projects"].append(context.user_data["temp_project"].copy())
+        context.user_data["temp_project"].clear()
         return ConversationHandler.END
     else:
         query.edit_message_text("Cancelled.")
