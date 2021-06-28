@@ -25,9 +25,10 @@ def start(update: Update, context: CallbackContext) -> None:
     bot.sendMessage(chat_id=update.message.chat_id,
                     text=f"Hello <b>{update.message.from_user.username}</b> and welcome to "
                          f"SUTD Productions' <b>Video Project Telegram Bot!</b> 👋\n\n"
-
-                         f"This bot is a one-stop platform for you to share your wildest video ideas, "
-                         f"or to join a team with others. Once enough people have opted into your idea, "
+                         
+                         f"This bot is a one-stop platform for you to share your wildest video project ideas "
+                         f"and connect with other people to produce them. You can also view other people's ideas, "
+                         f"and join their production team. Once enough people have opted into your idea, "
                          f"we will contact you via Telegram to begin. "
                          f"<b>Ideate - find a team - get filming!</b> 🎬\n\n"
 
