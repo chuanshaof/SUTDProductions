@@ -21,7 +21,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-my_persistence = PicklePersistence(filename='my_file')
+my_persistence = PicklePersistence(filename='persistence_file')
 
 TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
