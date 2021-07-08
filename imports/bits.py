@@ -2,26 +2,26 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
+import firebase
+
 
 # Check subscribed members
 def check_subs(update: Update, context: CallbackContext) -> None:
-    subs = ""
-    for each in context.bot_data["subscribe"]:
-        subs = subs + "@" + each[1] + "\n"
-    update.message.reply_text(subs)
+    admins = firebase.db.child("admin").get().val()
+    if admins is not None and update.message.from_user.id in admins:
+        subs = ""
+        subscribers = firebase.db.child("subscribe").get().val()
+        for each in subscribers:
+            subs = subs + "@" + subscribers[each] + "\n"
+        update.message.reply_text(subs)
     return
 
 
-# ---------------------------------------------------------------------------------------------#
 # Clearing of admins
 def clear_admins(update: Update, context: CallbackContext) -> None:
-    if "admin" not in context.bot_data:
-        context.bot_data["admin"] = list()
-
-    if update.message.from_user.id not in context.bot_data["admin"]:
-        return
-    else:
-        context.bot_data["admin"].clear()
+    admins = firebase.db.child("admin").get().val()
+    if admins is not None and update.message.from_user.id in admins:
+        firebase.db.child("admin").remove()
         update.message.reply_text("Admin list cleared.")
 
 

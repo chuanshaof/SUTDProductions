@@ -4,8 +4,8 @@ from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, Comm
 
 from imports import bits, subscribe, remove, edit, admin, announce, add, start, view_projects, globals, block_add
 
+import firebase
 import logging
-
 import os
 
 """
@@ -21,7 +21,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-my_persistence = PicklePersistence(filename='persistence_file')
 
 TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
@@ -33,7 +32,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(TOKEN, persistence=my_persistence, use_context=True)
+    updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -126,7 +125,7 @@ def main():
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=TOKEN)
-    updater.bot.setWebhook('https://boiling-badlands-67618.herokuapp.com/' + TOKEN)
+    updater.bot.setWebhook('https://sutdproductions.herokuapp.com/' + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
@@ -146,5 +145,6 @@ def error(update, context):
 
 
 if __name__ == '__main__':
+    firebase.initialize()
     globals.initialize()
     main()

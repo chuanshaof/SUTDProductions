@@ -3,14 +3,15 @@ from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, Comm
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
 from imports import globals
+import firebase
+
 
 # Admin Verification
 # ---------------------------------------------------------------------------------------------#
 def admin(update: Update, context: CallbackContext) -> int:
-    if "admin" not in context.bot_data:
-        context.bot_data["admin"] = list()
+    admins = firebase.db.child("admin").get().val()
 
-    if update.message.from_user.id in context.bot_data["admin"]:
+    if admins is not None and update.message.from_user.id in admins:
         update.message.reply_text("Already verified.\n\n"
                                   "You can now utilize the following commands:\n\n"
                                   "/add - Add projects to the list\n"
@@ -21,7 +22,7 @@ def admin(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
     else:
         update.message.reply_text("Enter the admin code")
-    return globals.WAIT_CODE
+        return globals.WAIT_CODE
 
 
 # Admin Verification, step 2
@@ -36,7 +37,14 @@ def verify(update: Update, context: CallbackContext) -> None:
                                   "/edit - Edit project details\n"
                                   "/announce - Send a message to all subscribers\n"
                                   "/check_subs - Check who is subscribed to the bot")
-        context.bot_data["admin"].append(update.message.from_user.id)
+        admins = firebase.db.child("admin").get().val()
+
+        if admins == None:
+            admins = [update.message.from_user.id]
+        else:
+            admins.append(update.message.from_user.id)
+        firebase.db.child("admin").set(admins)
     else:
         update.message.reply_text("Invalid")
+
     return ConversationHandler.END

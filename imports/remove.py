@@ -4,53 +4,53 @@ from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, Comm
 
 from imports.bits import view_projects
 from imports import globals
+import firebase
 
 
 # Removing projects
 # ---------------------------------------------------------------------------------------------#
 def remove(update: Update, context: CallbackContext) -> None:
-    if "admin" not in context.bot_data:
-        context.bot_data["admin"] = list()
+    admins = firebase.db.child("admin").get().val()
+    projects = firebase.db.child("project").get().val()
 
-    if update.message.from_user.id not in context.bot_data["admin"]:
-        return
-    else:
-        if "projects" not in context.bot_data or len(context.bot_data["projects"]) == 0:
-            context.bot_data["projects"] = list()
+    if admins is not None and update.message.from_user.id in admins:
+        if projects == None:
             update.message.reply_text("Sorry, there are no projects at the moment!")
-            return
+            return ConversationHandler.END
         else:
             keyboard = list()
-
-            for each in context.bot_data["projects"]:
-                project = InlineKeyboardButton(each[0], callback_data=each[0])
+            for each in projects:
+                project = InlineKeyboardButton(each, callback_data=each)
                 keyboard.append([project])
 
             reply_markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text("Please select the project name you want to remove.", reply_markup=reply_markup)
             return globals.REMOVE
+    else:
+        return
 
 
 # Remove project (CONFIRM)
 def remove_confirm(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
+    projects = firebase.db.child("project").get().val()
 
-    for each in context.bot_data["projects"]:
+    for each in projects:
         # Each[0] represents the name
-        if query.data == each[0]:
-            keyboard = [[InlineKeyboardButton("Yes", callback_data="Y" + each[0])],
-                        [InlineKeyboardButton("No", callback_data="N" + each[0])]]
+        if query.data == each:
+            keyboard = [[InlineKeyboardButton("Yes", callback_data="Y" + each)],
+                        [InlineKeyboardButton("No", callback_data="N" + each)]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
 
-            query.edit_message_text(f"{view_projects(each)}\n"
+            query.edit_message_text(f"{view_projects(projects[each])}\n"
                                     f"Please confirm project removal.",
                                     reply_markup=reply_markup,
                                     parse_mode=ParseMode.HTML)
-        if query.data == "Y" + each[0]:
-            query.edit_message_text(f"{each[0]} has been successfully removed.")
-            context.bot_data["projects"].remove(each)
+        if query.data == "Y" + each:
+            query.edit_message_text(f"{each} has been successfully removed.")
+            firebase.db.child("project").child(each).remove()
             return ConversationHandler.END
-        elif query.data == "N" + each[0]:
+        elif query.data == "N" + each:
             query.edit_message_text("Cancelled.")
             return ConversationHandler.END

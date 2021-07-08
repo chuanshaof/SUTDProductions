@@ -5,6 +5,7 @@ from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, Comm
 import os
 
 from imports import globals
+import firebase
 
 TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
@@ -12,22 +13,16 @@ dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
 
 def announce(update: Update, context: CallbackContext) -> None:
-    if "admin" not in context.bot_data:
-        context.bot_data["admin"] = list()
-
-    if update.message.from_user.id not in context.bot_data["admin"]:
+    admins = firebase.db.child("admin").get().val()
+    subscribers = firebase.db.child("subscriber").get().val()
+    if admins is not None and update.message.from_user.id in admins:
+        if subscribers is not None:
+            for each in subscribers:
+                update.message.reply_text("Enter the message to announce.")
+                return globals.ANNOUNCE_QUERY
+        update.message.reply_text("No one is subscribed to the bot.")
         return
-    else:
-        if "subscribe" not in context.bot_data:
-            context.bot_data["subscribe"] = list()
-            update.message.reply_text("No one is subscribed to the bot.")
-            return
-        elif len(context.bot_data["subscribe"]) == 0:
-            update.message.reply_text("No one is subscribed to the bot.")
-            return
-        else:
-            update.message.reply_text("Enter the message to announce.")
-            return globals.ANNOUNCE_QUERY
+    return
 
 
 def announcement_confirm(update: Update, context: CallbackContext) -> None:
@@ -49,9 +44,11 @@ def announcement_confirm(update: Update, context: CallbackContext) -> None:
 def announcement(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
+    subscribers = firebase.db.child("subscriber").get().val()
+
     if query.data == "Y":
-        for each in context.bot_data["subscribe"]:
-            forward_to = str(each[0])
+        for each in subscribers:
+            forward_to = str(each)
             bot.sendMessage(chat_id=forward_to,
                             text=announce_message,
                             parse_mode=ParseMode.HTML)

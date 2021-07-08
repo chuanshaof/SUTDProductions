@@ -6,6 +6,7 @@ import os
 
 from imports.bits import view_projects
 from imports import globals
+import firebase
 
 TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
@@ -15,19 +16,14 @@ dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 # Adding Projects
 # ---------------------------------------------------------------------------------------------#
 def add(update: Update, context: CallbackContext) -> int:
-    if "projects" not in context.bot_data:
-        context.bot_data["projects"] = list()
+    admins = firebase.db.child("admin").get().val()
 
-    if update.message.from_user.id not in context.bot_data["admin"]:
-        return ConversationHandler.END
-    else:
-        if "projects" not in context.bot_data:
-            context.bot_data["projects"] = list()
-        if "temp_project" not in context.user_data:
-            context.user_data["temp_project"] = list()
-        context.user_data["temp_project"].clear()
+    if admins is not None and update.message.from_user.id in admins:
+        firebase.db.child(update.message.from_user.id).set(list())
         update.message.reply_text("Please enter project name, maximum of 50 characters all in one line.")
         return globals.PROJECT_NAME
+    else:
+        return ConversationHandler.END
 
 
 # Adding Projects (TITLE)
@@ -36,13 +32,16 @@ def project_name(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Please enter a valid project name.")
         return globals.PROJECT_NAME
 
-    for each in context.bot_data["projects"]:
-        if update.message.text == each[0]:
-            update.message.reply_text("Project name has been taken, please key in a new project name.")
-            return globals.PROJECT_NAME
+    projects = firebase.db.child("project").get().val()
 
+    if projects is not None:
+        for each in projects:
+            if each == update.message.text:
+                update.message.reply_text("Project name has been taken, please key in a new project name.")
+                return globals.PROJECT_NAME
+
+    context.user_data["temp_project"] = list()
     context.user_data["temp_project"].append(update.message.text)
-
     update.message.reply_text("Please enter project description.")
     return globals.PROJECT_DESCRIPTION
 
@@ -54,10 +53,8 @@ def project_description(update: Update, context: CallbackContext) -> None:
         return globals.PROJECT_DESCRIPTION
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project POC.")
-
-    return globals.PROJECT_POC
+        update.message.reply_text("Please enter project POC.")
+        return globals.PROJECT_POC
 
 
 # Adding Projects (DETAILS)
@@ -67,10 +64,8 @@ def project_poc(update: Update, context: CallbackContext) -> None:
         return globals.PROJECT_POC
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project venue.")
-
-    return globals.PROJECT_VENUE
+        update.message.reply_text("Please enter project venue.")
+        return globals.PROJECT_VENUE
 
 
 # Adding Projects (DETAILS)
@@ -80,10 +75,8 @@ def project_venue(update: Update, context: CallbackContext) -> None:
         return globals.PROJECT_VENUE
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project purpose.")
-
-    return globals.PROJECT_PURPOSE
+        update.message.reply_text("Please enter project purpose.")
+        return globals.PROJECT_PURPOSE
 
 
 # Adding Projects (DETAILS)
@@ -93,10 +86,8 @@ def project_purpose(update: Update, context: CallbackContext) -> None:
         return globals.PROJECT_PURPOSE
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project inspiration.")
-
-    return globals.PROJECT_INSPIRATION
+        update.message.reply_text("Please enter project inspiration.")
+        return globals.PROJECT_INSPIRATION
 
 
 # Adding Projects (INSPIRATION)
@@ -106,9 +97,8 @@ def project_inspiration(update: Update, context: CallbackContext) -> int:
         return globals.PROJECT_DESCRIPTION
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project roles.")
-    return globals.PROJECT_ROLES
+        update.message.reply_text("Please enter project roles.")
+        return globals.PROJECT_ROLES
 
 
 # Adding Projects (ROLES)
@@ -118,9 +108,8 @@ def project_roles(update: Update, context: CallbackContext) -> int:
         return globals.PROJECT_ROLES
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project deadline.")
-    return globals.PROJECT_DEADLINE
+        update.message.reply_text("Please enter project deadline.")
+        return globals.PROJECT_DEADLINE
 
 
 # Adding Projects (DEADLINE)
@@ -130,9 +119,8 @@ def project_deadline(update: Update, context: CallbackContext) -> int:
         return globals.PROJECT_DEADLINE
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project requirement.")
-    return globals.PROJECT_REQUIREMENTS
+        update.message.reply_text("Please enter project requirement.")
+        return globals.PROJECT_REQUIREMENTS
 
 
 # Adding Projects (DEADLINE)
@@ -142,9 +130,8 @@ def project_requirement(update: Update, context: CallbackContext) -> int:
         return globals.PROJECT_REQUIREMENTS
     else:
         context.user_data["temp_project"].append(update.message.text)
-
-    update.message.reply_text("Please enter project team.")
-    return globals.PROJECT_TEAM
+        update.message.reply_text("Please enter project team.")
+        return globals.PROJECT_TEAM
 
 
 # Adding Projects (TEAM)
@@ -175,8 +162,7 @@ def project_confirm(update: Update, context: CallbackContext) -> None:
 
     if query.data == "Yes":
         query.edit_message_text(f"Successfully added {context.user_data['temp_project'][0]}.")
-        context.bot_data["projects"].append(context.user_data["temp_project"].copy())
-        context.user_data["temp_project"].clear()
+        firebase.db.child("project").child(context.user_data["temp_project"][0]).set(context.user_data["temp_project"])
         return ConversationHandler.END
     else:
         query.edit_message_text("Cancelled.")
