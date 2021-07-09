@@ -15,6 +15,7 @@ def admin(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Already verified.\n\n"
                                   "You can now utilize the following commands:\n\n"
                                   "/add - Add projects to the list\n"
+                                  "/block_add - Add projects by a block\n"
                                   "/remove - Remove projects from the list\n"
                                   "/edit - Edit project details\n"
                                   "/announce - Send a message to all subscribers\n"
@@ -33,6 +34,7 @@ def verify(update: Update, context: CallbackContext) -> None:
     if user_input == code:
         update.message.reply_text("Verified, you can now utilize the following commands:\n\n"
                                   "/add - Add projects to the list\n"
+                                  "/block_add - Add projects by a block\n"
                                   "/remove - Remove projects from the list\n"
                                   "/edit - Edit project details\n"
                                   "/announce - Send a message to all subscribers\n"

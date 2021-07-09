@@ -148,7 +148,8 @@ def project_team(update: Update, context: CallbackContext) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     bot.sendMessage(chat_id=update.message.chat_id,
-                    text="Please confirm project details.\n\n"
+                    text="Please confirm project details.\n"
+                         "NOTE: You can copy this and use /block_add to edit if there are any changes!\n\n"
                          + view_projects(context.user_data["temp_project"]),
                     reply_markup=reply_markup,
                     parse_mode=ParseMode.HTML)
