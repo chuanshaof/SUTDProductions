@@ -49,7 +49,7 @@ def remove_confirm(update: Update, context: CallbackContext) -> None:
                                     parse_mode=ParseMode.HTML)
         if query.data == "Y" + each:
             query.edit_message_text(f"{each} has been successfully removed.")
-            firebase.db.child("project").child(each).remove()
+            firebase.db.child("project").child(each.replace("?", "%3F")).remove()
             return ConversationHandler.END
         elif query.data == "N" + each:
             query.edit_message_text("Cancelled.")
