@@ -163,7 +163,8 @@ def project_confirm(update: Update, context: CallbackContext) -> None:
 
     if query.data == "Yes":
         query.edit_message_text(f"Successfully added {context.user_data['temp_project'][0]}.")
-        firebase.db.child("project").child(context.user_data["temp_project"][0]).set(context.user_data["temp_project"])
+        firebase.db.child("project").child(context.user_data["temp_project"][0].replace("?", "%3F"))\
+            .set(context.user_data["temp_project"])
         return ConversationHandler.END
     else:
         query.edit_message_text("Cancelled.")
