@@ -10,7 +10,8 @@ def check_subs(update: Update, context: CallbackContext) -> None:
     admins = firebase.db.child("admin").get().val()
     if admins is not None and update.message.from_user.id in admins:
         subs = ""
-        subscribers = firebase.db.child("subscribe").get().val()
+        subscribers = firebase.db.child("subscriber").get().val()
+        print(subscribers)
         for each in subscribers:
             subs = subs + "@" + subscribers[each] + "\n"
         update.message.reply_text(subs)
