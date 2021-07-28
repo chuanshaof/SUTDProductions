@@ -82,7 +82,8 @@ def confirm(update: Update, context: CallbackContext) -> int:
 
             if every == 0:
                 if len(entry) > 50 or "\n" in entry:
-                    update.message.reply_text("Please enter a valid project name.")
+                    update.message.reply_text("Please enter a valid project name that is less than 50 characters long "
+                                              "and does not contain a new line")
                     return ConversationHandler.END
 
                 projects = firebase.db.child("project").get().val()
