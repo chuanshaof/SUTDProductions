@@ -54,7 +54,7 @@ def start_query(update: Update, context: CallbackContext) -> None:
     # Social media list
     if query.data == str(SOCIALS):
         keyboard = [[InlineKeyboardButton("Instagram", url='https://www.instagram.com/sutdproductions/')],
-                    [InlineKeyboardButton("Website", url='https://sutd.productions')],
+                    # [InlineKeyboardButton("Website", url='https://sutd.productions')],
                     [InlineKeyboardButton("Youtube", url='https://www.youtube.com/user/SUTDProductions')],
                     [InlineKeyboardButton("Main Menu", callback_data="return")]]
 
