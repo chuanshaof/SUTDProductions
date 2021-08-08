@@ -5,8 +5,9 @@ from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, Comm
 import os
 
 from imports import globals
+import firebase
 
-SOCIALS = range(1)
+SOCIALS, VIEW_PROJECTS = range(2)
 
 TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
@@ -18,7 +19,8 @@ dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 def start(update: Update, context: CallbackContext) -> None:
     keyboard = [[InlineKeyboardButton("Suggest Project", url='https://forms.gle/gQppNaaFqKkCHhHw6')],
                 [InlineKeyboardButton("Join our telegram chat", url='https://t.me/joinchat/SME7jUkjNIcSKc9v')],
-                [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))]]
+                [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))],
+                [InlineKeyboardButton("View Projects", callback_data=str(VIEW_PROJECTS))]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -93,3 +95,20 @@ def start_query(update: Update, context: CallbackContext) -> None:
                              "questions or feedback!",
                         parse_mode=ParseMode.HTML,
                         reply_markup=reply_markup)
+
+    elif query.data == str(VIEW_PROJECTS):
+        projects = firebase.db.child("project").get().val()
+
+        if projects == None:
+            update.message.reply_text("Sorry, there are no projects at the moment!")
+            return ConversationHandler.END
+        else:
+            keyboard = list()
+            for each in projects:
+                project = InlineKeyboardButton(each, callback_data=each)
+                keyboard.append([project])
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text('To view more details of each project, click on the title.',
+                                      reply_markup=reply_markup)
+            return globals.VIEW_PROJECTS
