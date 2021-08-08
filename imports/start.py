@@ -100,7 +100,8 @@ def start_query(update: Update, context: CallbackContext) -> None:
         projects = firebase.db.child("project").get().val()
 
         if projects == None:
-            update.message.reply_text("Sorry, there are no projects at the moment!")
+            bot.sendMessage(chat_id=query.message.chat_id,
+                            text="Sorry, there are no projects at the moment!")
             return ConversationHandler.END
         else:
             keyboard = list()
@@ -109,6 +110,7 @@ def start_query(update: Update, context: CallbackContext) -> None:
                 keyboard.append([project])
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_text('To view more details of each project, click on the title.',
-                                      reply_markup=reply_markup)
+            bot.sendMessage(chat_id=query.message.chat_id,
+                            text='To view more details of each project, click on the title.',
+                            reply_markup=reply_markup)
             return globals.VIEW_PROJECTS
