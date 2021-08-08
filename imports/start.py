@@ -66,7 +66,8 @@ def start_query(update: Update, context: CallbackContext) -> None:
     elif query.data == "return":
         keyboard = [[InlineKeyboardButton("Suggest Project", url='https://forms.gle/gQppNaaFqKkCHhHw6')],
                     [InlineKeyboardButton("Join our telegram chat", url='https://t.me/joinchat/SME7jUkjNIcSKc9v')],
-                    [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))]]
+                    [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))],
+                    [InlineKeyboardButton("View Projects", callback_data=str(VIEW_PROJECTS))]]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -100,8 +101,7 @@ def start_query(update: Update, context: CallbackContext) -> None:
         projects = firebase.db.child("project").get().val()
 
         if projects == None:
-            bot.sendMessage(chat_id=query.message.chat_id,
-                            text="Sorry, there are no projects at the moment!")
+            query.edit_message_text("Sorry, there are no projects at the moment!")
             return ConversationHandler.END
         else:
             keyboard = list()
@@ -110,7 +110,6 @@ def start_query(update: Update, context: CallbackContext) -> None:
                 keyboard.append([project])
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            bot.sendMessage(chat_id=query.message.chat_id,
-                            text='To view more details of each project, click on the title.',
-                            reply_markup=reply_markup)
+            query.edit_message_text('To view more details of each project, click on the title.',
+                                    reply_markup=reply_markup)
             return globals.VIEW_PROJECTS
