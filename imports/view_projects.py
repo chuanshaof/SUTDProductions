@@ -62,7 +62,7 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
                                         f"please contact @haoron to check your join status.")
                 return ConversationHandler.END
             else:
-                projects[each][9] = projects[each][9] + "\n@" + query.from_user.username
+                # projects[each][9] = projects[each][9] + "\n@" + query.from_user.username
                 HAORON = 255414224
                 CS = 229599548
                 NOAH = 262240949
@@ -79,9 +79,9 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
                                      f"{view_projects(projects[each])}",
                                 parse_mode=ParseMode.HTML)
 
-                firebase.db.child("project")\
-                    .child(each)\
-                    .set(projects[each])
+                # firebase.db.child("project")\
+                #     .child(each)\
+                #     .set(projects[each])
 
                 query.edit_message_text("Thank you for signing up!\n"
                                         "Your interest has been noted and we will be getting back to you shortly.")
