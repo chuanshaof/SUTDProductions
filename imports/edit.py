@@ -102,7 +102,7 @@ def edit_query(update: Update, context: CallbackContext) -> None:
                 elif query.data == "confirm":
                     if project_details[every] + each in context.user_data["temp_edit"]:
                         if every == 0:
-                            firebase.db.child("project").child(each).remove()
+                            firebase.db.child("project").child(each.replace("?", "%3F")).remove()
 
                         length = len(project_details[every] + each)
                         projects[each][every] = context.user_data["temp_edit"][length:]
@@ -139,7 +139,7 @@ def edit_confirmation(update: Update, context: CallbackContext) -> None:
                                 "Project name has been taken, please key in a new project name.")
                             return globals.EDIT_CONFIRM
 
-                context.user_data["temp_edit"] = project_details[every].replace("?", "%3F") + each + update.message.text
+                context.user_data["temp_edit"] = project_details[every] + each + update.message.text
                 projects[each][every] = update.message.text
                 bot.sendMessage(chat_id=update.message.chat_id,
                                 text=f"Please confirm the new project details:\n\n"
