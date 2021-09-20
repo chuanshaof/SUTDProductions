@@ -106,7 +106,10 @@ def edit_query(update: Update, context: CallbackContext) -> None:
 
                         length = len(project_details[every] + each)
                         projects[each][every] = context.user_data["temp_edit"][length:]
-                        firebase.db.child("project").child(projects[each][0].replace("?", "%3F")).set(projects[each])
+
+
+                        firebase.db.child("project").child(projects[each][0].replace("?", "%3F"))\
+                            .set(projects[each].replace("?", "%3F"))
                         query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                                      f"{view_projects(projects[each])}",
                                                      parse_mode=ParseMode.HTML)
