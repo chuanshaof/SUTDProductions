@@ -59,7 +59,7 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
         if query.data == "join" + each:
             if query.from_user.username in projects[each][9]:
                 query.edit_message_text(f"You have already signed up for this project, "
-                                        f"please contact @haoron to check your join status.")
+                                        f"please contact @{globals.PRESIDENT} to check your join status.")
                 return ConversationHandler.END
             else:
                 # projects[each][9] = projects[each][9] + "\n@" + query.from_user.username
