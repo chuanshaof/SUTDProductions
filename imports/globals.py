@@ -13,5 +13,5 @@ def initialize():
     VIEW_PROJECTS = range(19, 20)
     BLOCK_ADD = range(20, 21)
 
+    PRESIDENT = "kong_noah"
 
-    PRESIDENT = kong_noah
