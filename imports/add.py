@@ -12,25 +12,14 @@ TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
-add_details = ["Name: ",
-               "Description: ",
-               "POC: ",
-               "Venue: ",
-               "Project Purpose: ",
-               "Inspiration: ",
-               "Roles needed: ",
-               "Production Deadline: ",
-               "Project Requirement: ",
-               "Team: "]
-
 
 # Adding Projects
 # ---------------------------------------------------------------------------------------------#
 def add(update: Update, context: CallbackContext) -> int:
     text = "Please enter the new project details in the format of:\n" \
            "(For empty entries, put NIL)\n\n"
-    for every in range(len(add_details)):
-        text = text + add_details[every] + "\n"
+    for every in range(len(globals.project_details)):
+        text = text + globals.project_details[every] + "\n"
     update.message.reply_text(text,
                               parse_mode=ParseMode.HTML)
 
@@ -40,8 +29,8 @@ def add(update: Update, context: CallbackContext) -> int:
 def confirm(update: Update, context: CallbackContext) -> int:
     context.user_data["temp_project"] = list()
 
-    for every in range(len(add_details)):
-        if add_details[every] not in update.message.text:
+    for every in range(len(globals.project_details)):
+        if globals.project_details[every] not in update.message.text:
             update.message.reply_text("Project details are incomplete, please use /add to retry accordingly "
                                       "to the example below:\n\n"
                                       f"Name: SUTD Productions\n"
@@ -58,11 +47,11 @@ def confirm(update: Update, context: CallbackContext) -> int:
             return ConversationHandler.END
 
         if every == 9:
-            found = update.message.text.find(add_details[every]) + len(add_details[every])
+            found = update.message.text.find(globals.project_details[every]) + len(globals.project_details[every])
             context.user_data["temp_project"].append(update.message.text[found:])
         else:
-            found = update.message.text.find(add_details[every]) + len(add_details[every])
-            next_find = update.message.text.find(add_details[every + 1])
+            found = update.message.text.find(globals.project_details[every]) + len(globals.project_details[every])
+            next_find = update.message.text.find(globals.project_details[every + 1])
             entry = update.message.text[found:next_find-1]
             if not entry:
                 update.message.reply_text("Project details are incomplete, please use /add to retry accordingly "

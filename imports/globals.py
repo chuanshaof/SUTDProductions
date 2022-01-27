@@ -1,6 +1,6 @@
 def initialize():
     global WAIT_CODE, START, PROJECT_CONFIRM, REMOVE, ANNOUNCE_QUERY, ANNOUNCE, EDIT, EDIT_CONFIRM, VIEW_PROJECTS, \
-        ADD, SUGGEST, SUGGEST_CONFIRM, PRESIDENT
+        ADD, SUGGEST, SUGGEST_CONFIRM, PRESIDENT, project_details
 
     WAIT_CODE = range(1)
     START = range(1, 2)
@@ -13,4 +13,15 @@ def initialize():
     SUGGEST, SUGGEST_CONFIRM = range(22, 24)
 
     PRESIDENT = "kong_noah"
+
+    project_details = ["Name:",
+                       "Description:",
+                       "POC:",
+                       "Venue:",
+                       "Project Purpose:",
+                       "Inspiration:",
+                       "Roles needed:",
+                       "Production Deadline:",
+                       "Project Requirement:",
+                       "Team:"]
 

@@ -39,3 +39,4 @@ def view_projects(project: list) -> str:
                 f"Project Requirement: {project[8]}\n" \
                 f"Team: {project[9]}\n"
     return view_proj
+

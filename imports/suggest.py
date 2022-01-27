@@ -12,25 +12,14 @@ TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
-add_details = ["Name: ",
-               "Description: ",
-               "POC: ",
-               "Venue: ",
-               "Project Purpose: ",
-               "Inspiration: ",
-               "Roles needed: ",
-               "Production Deadline: ",
-               "Project Requirement: ",
-               "Team: "]
 
-
-# Adding Projects
+# Suggesting Projects
 # ---------------------------------------------------------------------------------------------#
 def suggest(update: Update, context: CallbackContext) -> int:
     text = "Suggest a project in the format of:\n" \
            "(For empty entries, put NIL)\n\n"
-    for every in range(len(add_details)):
-        text = text + add_details[every] + "\n"
+    for every in range(len(globals.project_details)):
+        text = text + globals.project_details[every] + "\n"
     update.message.reply_text(text,
                               parse_mode=ParseMode.HTML)
 
@@ -40,9 +29,9 @@ def suggest(update: Update, context: CallbackContext) -> int:
 def confirm(update: Update, context: CallbackContext) -> int:
     context.user_data["temp_project"] = list()
 
-    for every in range(len(add_details)):
-        if add_details[every] not in update.message.text:
-            update.message.reply_text("Project details are incomplete, please use /block_add to retry accordingly "
+    for every in range(len(globals.project_details)):
+        if globals.project_details[every] not in update.message.text:
+            update.message.reply_text("Project details are incomplete, please use /block_project to retry accordingly "
                                       "to the example below:\n\n"
                                       f"Name: SUTD Productions\n"
                                       f"Details: Club\n"
@@ -58,17 +47,17 @@ def confirm(update: Update, context: CallbackContext) -> int:
             return ConversationHandler.END
 
         if every == 9:
-            found = update.message.text.find(add_details[every]) + len(add_details[every])
+            found = update.message.text.find(globals.project_details[every]) + len(globals.project_details[every])
             context.user_data["temp_project"].append(update.message.text[found:])
         else:
-            found = update.message.text.find(add_details[every]) + len(add_details[every])
-            next_find = update.message.text.find(add_details[every + 1])
+            found = update.message.text.find(globals.project_details[every]) + len(globals.project_details[every])
+            next_find = update.message.text.find(globals.project_details[every + 1])
             entry = update.message.text[found:next_find-1]
             if not entry:
-                update.message.reply_text("Project details are incomplete, please use /block_add to retry accordingly "
+                update.message.reply_text("Project details are incomplete, please use /block_project to retry accordingly "
                                           "to the example below:\n\n"
                                           f"Name: SUTD Productions\n"
-                                          f"Details: Club\n"
+                                          f"Description: Club\n"
                                           f"POC: NIL\n"
                                           f"Venue: SUTD\n"
                                           f"Project Purpose: NIL\n"
@@ -79,12 +68,6 @@ def confirm(update: Update, context: CallbackContext) -> int:
                                           f"Team: Jean, Noah",
                                           parse_mode=ParseMode.HTML)
                 return ConversationHandler.END
-
-            if every == 0:
-                if len(entry) > 50 or "\n" in entry:
-                    update.message.reply_text("Please enter a valid project name that is less than 50 characters long "
-                                              "and does not contain a new line")
-                    return ConversationHandler.END
 
             context.user_data["temp_project"].append(entry)
 

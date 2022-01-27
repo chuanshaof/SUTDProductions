@@ -2,8 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-from imports import bits, subscribe, remove, edit, admin, announce, add, start, view_projects, globals, add, \
-    suggest
+from imports import bits, subscribe, remove, edit, admin, announce, start, globals, add, suggest
 
 import firebase
 import logging
@@ -12,6 +11,7 @@ import os
 """
 git add .
 git commit -m "changing python3 to python in Procfile"
+git push heroku Head:master
 git push heroku master
 """
 
@@ -76,7 +76,6 @@ def main():
 
     state_2 = {
             globals.START: [CallbackQueryHandler(start.start_query)],
-            globals.VIEW_PROJECTS: [CallbackQueryHandler(view_projects.view_project_query)],
             globals.REMOVE: [CallbackQueryHandler(remove.remove_confirm)]
         }
 
@@ -89,13 +88,13 @@ def main():
             CommandHandler("subscribe", subscribe.subscribe),
             CommandHandler("check_subs", bits.check_subs),
             CommandHandler("clear_admins", bits.clear_admins),
-            CommandHandler("viewprojects", view_projects.view_project),
+            CommandHandler("viewprojects", start.view_project),
             CommandHandler("remove", remove.remove),
             CommandHandler("admin", admin.admin),
             CommandHandler("edit", edit.edit),
             CommandHandler("announce", announce.announce),
             CommandHandler("add", add.add),
-            CommandHandler("suggestproject", suggest.suggest)
+            CommandHandler("suggest", suggest.suggest)
         ],
         states=all_states,
         fallbacks=[CommandHandler("cancel", cancel)],
