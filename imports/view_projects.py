@@ -12,6 +12,8 @@ TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
+SOCIALS, VIEW_PROJECTS, SUGGEST = range(3)
+
 
 def view_project(update: Update, context: CallbackContext) -> int:
     projects = firebase.db.child("project").get().val()
@@ -24,6 +26,8 @@ def view_project(update: Update, context: CallbackContext) -> int:
         for each in projects:
             project = InlineKeyboardButton(each, callback_data=each)
             keyboard.append([project])
+
+        keyboard.append([InlineKeyboardButton("Main Menu", callback_data="main")])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text('To view more details of each project, click on the title.',
@@ -40,6 +44,8 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
         for each in projects:
             project = InlineKeyboardButton(each, callback_data=each)
             keyboard.append([project])
+
+        keyboard.append([InlineKeyboardButton("Main Menu", callback_data="main")])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_text('To view more details of each project, click on the title.',
@@ -62,22 +68,46 @@ def view_project_query(update: Update, context: CallbackContext) -> None:
                                         f"please contact @{globals.PRESIDENT} to check your join status.")
                 return ConversationHandler.END
             else:
-                # projects[each][9] = projects[each][9] + "\n@" + query.from_user.username
-                CS = 229599548
                 NOAH = 262240949
                 bot.sendMessage(chat_id=NOAH,
                                 text=f"Hi, @{query.from_user.username} has signed up for the following project.\n\n"
                                      f"{view_projects(projects[each])}",
                                 parse_mode=ParseMode.HTML)
-                bot.sendMessage(chat_id=CS,
-                                text=f"Hi, @{query.from_user.username} has signed up for the following project.\n\n"
-                                     f"{view_projects(projects[each])}",
-                                parse_mode=ParseMode.HTML)
-
-                # firebase.db.child("project")\
-                #     .child(each)\
-                #     .set(projects[each])
 
                 query.edit_message_text("Thank you for signing up!\n"
                                         "Your interest has been noted and we will be getting back to you shortly.")
                 return ConversationHandler.END
+
+
+        if query.data == "main":
+            keyboard = [[InlineKeyboardButton("Suggest Project", callback_data=str(SUGGEST))],
+                        [InlineKeyboardButton("Join our telegram chat", url='https://t.me/joinchat/SME7jUkjNIcSKc9v')],
+                        [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))],
+                        [InlineKeyboardButton("View Projects", callback_data=str(VIEW_PROJECTS))]]
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            query.edit_message_text(text=f"Hello <b>{query.from_user.username}</b> and welcome to "
+                                         f"<b>SUTD Productions'</b> Video Project Telegram Bot! 👋\n\n"
+
+                                         f"This bot is a one-stop platform for you to share your wildest video ideas, "
+                                         f"or to join a team with others. Once enough people have opted into your idea, "
+                                         f"we will contact you via Telegram to begin. Ideate - find a team - get filming! 🎬\n\n"
+
+                                         f"We're excited to have you here! We'll be updating the Bot with project ideas "
+                                         f"as soon as they're received, so sit tight and get ready to make some videos! 🎥\n\n"
+
+                                         f"The available commands on this bot are:\n"
+                                         f"/start - Connect with us\n"
+                                         f"/subscribe - Subscribe to the telegram bot for notifications\n"
+                                         f"/viewprojects - View and join current projects\n\n"
+
+                                         f"<b>Before you go, remember to:</b>\n"
+                                         f"📺 Subscribe to our <a href='https://www.youtube.com/user/SUTDProductions'>YouTube</a> channel\n"
+                                         f"📱 Invite your friends to our <a href='https://t.me/joinchat/SME7jUkjNIcSKc9v'>Telegram</a> community\n"
+                                         f"📷 Follow us on <a href='https://www.instagram.com/sutdproductions/'>Instagram</a>\n\n"
+
+                                         "Feel free to contact us directly at productions@club.sutd.edu.sg for any "
+                                         "questions or feedback!",
+                                    parse_mode=ParseMode.HTML,
+                                    reply_markup=reply_markup)

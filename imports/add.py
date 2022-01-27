@@ -12,135 +12,90 @@ TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
 dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 
+add_details = ["Name: ",
+               "Description: ",
+               "POC: ",
+               "Venue: ",
+               "Project Purpose: ",
+               "Inspiration: ",
+               "Roles needed: ",
+               "Production Deadline: ",
+               "Project Requirement: ",
+               "Team: "]
+
 
 # Adding Projects
 # ---------------------------------------------------------------------------------------------#
 def add(update: Update, context: CallbackContext) -> int:
-    admins = firebase.db.child("admin").get().val()
+    text = "Please enter the new project details in the format of:\n" \
+           "(For empty entries, put NIL)\n\n"
+    for every in range(len(add_details)):
+        text = text + add_details[every] + "\n"
+    update.message.reply_text(text,
+                              parse_mode=ParseMode.HTML)
 
-    if admins is not None and update.message.from_user.id in admins:
-        firebase.db.child(update.message.from_user.id).set(list())
-        update.message.reply_text("Please enter project name, maximum of 50 characters all in one line.")
-        return globals.PROJECT_NAME
-    else:
-        return ConversationHandler.END
+    return globals.ADD
 
 
-# Adding Projects (TITLE)
-def project_name(update: Update, context: CallbackContext) -> int:
-    if not update.message.text or len(update.message.text) > 50 or "\n" in update.message.text:
-        update.message.reply_text("Please enter a valid project name.")
-        return globals.PROJECT_NAME
-
-    projects = firebase.db.child("project").get().val()
-
-    if projects is not None:
-        for each in projects:
-            if each == update.message.text:
-                update.message.reply_text("Project name has been taken, please key in a new project name.")
-                return globals.PROJECT_NAME
-
+def confirm(update: Update, context: CallbackContext) -> int:
     context.user_data["temp_project"] = list()
-    context.user_data["temp_project"].append(update.message.text)
-    update.message.reply_text("Please enter project description.")
-    return globals.PROJECT_DESCRIPTION
 
+    for every in range(len(add_details)):
+        if add_details[every] not in update.message.text:
+            update.message.reply_text("Project details are incomplete, please use /add to retry accordingly "
+                                      "to the example below:\n\n"
+                                      f"Name: SUTD Productions\n"
+                                      f"Details: Club\n"
+                                      f"POC: NIL\n"
+                                      f"Venue: SUTD\n"
+                                      f"Project Purpose: NIL\n"
+                                      f"Inspiration: NIL\n"
+                                      f"Roles needed: Excos\n"
+                                      f"Production Deadline: 2021\n"
+                                      f"Project Requirement: NIL\n"
+                                      f"Team: Jean, Noah",
+                                      parse_mode=ParseMode.HTML)
+            return ConversationHandler.END
 
-# Adding Projects (DETAILS)
-def project_description(update: Update, context: CallbackContext) -> None:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project description.")
-        return globals.PROJECT_DESCRIPTION
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project POC.")
-        return globals.PROJECT_POC
+        if every == 9:
+            found = update.message.text.find(add_details[every]) + len(add_details[every])
+            context.user_data["temp_project"].append(update.message.text[found:])
+        else:
+            found = update.message.text.find(add_details[every]) + len(add_details[every])
+            next_find = update.message.text.find(add_details[every + 1])
+            entry = update.message.text[found:next_find-1]
+            if not entry:
+                update.message.reply_text("Project details are incomplete, please use /add to retry accordingly "
+                                          "to the example below:\n\n"
+                                          f"Name: SUTD Productions\n"
+                                          f"Details: Club\n"
+                                          f"POC: NIL\n"
+                                          f"Venue: SUTD\n"
+                                          f"Project Purpose: NIL\n"
+                                          f"Inspiration: NIL\n"
+                                          f"Roles needed: Excos\n"
+                                          f"Production Deadline: 2021\n"
+                                          f"Project Requirement: NIL\n"
+                                          f"Team: Jean, Noah",
+                                          parse_mode=ParseMode.HTML)
+                return ConversationHandler.END
 
+            if every == 0:
+                if len(entry) > 50 or "\n" in entry:
+                    update.message.reply_text("Please enter a valid project name that is less than 50 characters long "
+                                              "and does not contain a new line")
+                    return ConversationHandler.END
 
-# Adding Projects (DETAILS)
-def project_poc(update: Update, context: CallbackContext) -> None:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project POC.")
-        return globals.PROJECT_POC
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project venue.")
-        return globals.PROJECT_VENUE
+                projects = firebase.db.child("project").get().val()
 
+                if projects is not None:
+                    for each in projects:
+                        if each == update.message.text:
+                            update.message.reply_text(
+                                "Project name has been taken, please retry with a new project name.")
+                            return ConversationHandler.END
 
-# Adding Projects (DETAILS)
-def project_venue(update: Update, context: CallbackContext) -> None:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project venue.")
-        return globals.PROJECT_VENUE
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project purpose.")
-        return globals.PROJECT_PURPOSE
-
-
-# Adding Projects (DETAILS)
-def project_purpose(update: Update, context: CallbackContext) -> None:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project purpose.")
-        return globals.PROJECT_PURPOSE
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project inspiration.")
-        return globals.PROJECT_INSPIRATION
-
-
-# Adding Projects (INSPIRATION)
-def project_inspiration(update: Update, context: CallbackContext) -> int:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project inspiration.")
-        return globals.PROJECT_DESCRIPTION
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project roles.")
-        return globals.PROJECT_ROLES
-
-
-# Adding Projects (ROLES)
-def project_roles(update: Update, context: CallbackContext) -> int:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project roles.")
-        return globals.PROJECT_ROLES
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project deadline.")
-        return globals.PROJECT_DEADLINE
-
-
-# Adding Projects (DEADLINE)
-def project_deadline(update: Update, context: CallbackContext) -> int:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project deadline.")
-        return globals.PROJECT_DEADLINE
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project requirement.")
-        return globals.PROJECT_REQUIREMENTS
-
-
-# Adding Projects (DEADLINE)
-def project_requirement(update: Update, context: CallbackContext) -> int:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project requirement.")
-        return globals.PROJECT_REQUIREMENTS
-    else:
-        context.user_data["temp_project"].append(update.message.text)
-        update.message.reply_text("Please enter project team.")
-        return globals.PROJECT_TEAM
-
-
-# Adding Projects (TEAM)
-def project_team(update: Update, context: CallbackContext) -> None:
-    if not update.message.text:
-        update.message.reply_text("Please enter a valid project team.")
-        return globals.PROJECT_TEAM
-    else:
-        context.user_data["temp_project"].append(update.message.text)
+            context.user_data["temp_project"].append(entry)
 
     keyboard = [[InlineKeyboardButton("Yes", callback_data="Yes")],
                 [InlineKeyboardButton("No", callback_data="No")]]
@@ -148,16 +103,15 @@ def project_team(update: Update, context: CallbackContext) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     bot.sendMessage(chat_id=update.message.chat_id,
-                    text="Please confirm project details.\n"
-                         "NOTE: You can copy this and use /block_add to edit if there are any changes!\n\n"
+                    text="Please confirm project details.\n\n"
                          + view_projects(context.user_data["temp_project"]),
                     reply_markup=reply_markup,
                     parse_mode=ParseMode.HTML)
 
+    # Uses /add functions
     return globals.PROJECT_CONFIRM
 
-
-# Adding Projects (CONFIRM
+# Adding Projects (CONFIRM)
 def project_confirm(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 

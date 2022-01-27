@@ -49,9 +49,14 @@ def announcement(update: Update, context: CallbackContext) -> None:
     if query.data == "Y":
         for each in subscribers:
             forward_to = str(each)
-            bot.sendMessage(chat_id=forward_to,
-                            text=announce_message,
-                            parse_mode=ParseMode.HTML)
+            try:
+                bot.sendMessage(chat_id=forward_to,
+                                text=announce_message,
+                                parse_mode=ParseMode.HTML)
+            except:
+                print(each + " has blocked the bot.")
+                firebase.db.child("subscriber").child(str(update.message.from_user.id)).remove()
+
         query.edit_message_text("Successfully announced to subscribers.")
         return ConversationHandler.END
     elif query.data == "N":

@@ -26,15 +26,15 @@ add_details = ["Name: ",
 
 # Adding Projects
 # ---------------------------------------------------------------------------------------------#
-def block_add(update: Update, context: CallbackContext) -> int:
-    text = "Please enter the new project details in the format of:\n" \
+def suggest(update: Update, context: CallbackContext) -> int:
+    text = "Suggest a project in the format of:\n" \
            "(For empty entries, put NIL)\n\n"
     for every in range(len(add_details)):
         text = text + add_details[every] + "\n"
     update.message.reply_text(text,
                               parse_mode=ParseMode.HTML)
 
-    return globals.BLOCK_ADD
+    return globals.SUGGEST
 
 
 def confirm(update: Update, context: CallbackContext) -> int:
@@ -86,15 +86,6 @@ def confirm(update: Update, context: CallbackContext) -> int:
                                               "and does not contain a new line")
                     return ConversationHandler.END
 
-                projects = firebase.db.child("project").get().val()
-
-                if projects is not None:
-                    for each in projects:
-                        if each == update.message.text:
-                            update.message.reply_text(
-                                "Project name has been taken, please retry with a new project name.")
-                            return ConversationHandler.END
-
             context.user_data["temp_project"].append(entry)
 
     keyboard = [[InlineKeyboardButton("Yes", callback_data="Yes")],
@@ -108,5 +99,23 @@ def confirm(update: Update, context: CallbackContext) -> int:
                     reply_markup=reply_markup,
                     parse_mode=ParseMode.HTML)
 
-    # Uses /add functions
-    return globals.PROJECT_CONFIRM
+    return globals.SUGGEST_CONFIRM
+
+
+# Suggesting Projects (CONFIRM)
+def project_confirm(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+
+    if query.data == "Yes":
+        NOAH = 262240949
+        bot.sendMessage(chat_id=NOAH,
+                        text=f"Hi, @{query.from_user.username} has suggested the following project.\n\n"
+                             + view_projects(context.user_data["temp_project"]),
+                        parse_mode=ParseMode.HTML)
+
+        query.edit_message_text("Thank you for your suggestion!\n"
+                                "Your interest has been noted and we will be getting back to you shortly.")
+        return ConversationHandler.END
+    else:
+        query.edit_message_text("Cancelled.")
+        return ConversationHandler.END

@@ -2,7 +2,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Pa
 from telegram.ext import Updater, MessageHandler, CallbackContext, Filters, CommandHandler, ConversationHandler, \
     CallbackQueryHandler, Dispatcher, PicklePersistence
 
-from imports import bits, subscribe, remove, edit, admin, announce, add, start, view_projects, globals, block_add
+from imports import bits, subscribe, remove, edit, admin, announce, add, start, view_projects, globals, add, \
+    suggest
 
 import firebase
 import logging
@@ -45,30 +46,6 @@ def main():
             [MessageHandler(Filters.text & (~ Filters.command), edit.edit_confirmation)]
     }
 
-    add_states = {
-        globals.PROJECT_NAME:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_name)],
-        globals.PROJECT_DESCRIPTION:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_description)],
-        globals.PROJECT_POC:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_poc)],
-        globals.PROJECT_VENUE:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_venue)],
-        globals.PROJECT_PURPOSE:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_purpose)],
-        globals.PROJECT_INSPIRATION:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_inspiration)],
-        globals.PROJECT_ROLES:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_roles)],
-        globals.PROJECT_DEADLINE:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_deadline)],
-        globals.PROJECT_REQUIREMENTS:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_requirement)],
-        globals.PROJECT_TEAM:
-            [MessageHandler(Filters.text & (~ Filters.command), add.project_team)],
-        globals.PROJECT_CONFIRM:
-            [CallbackQueryHandler(add.project_confirm)]}
-
     announce_states = {
         globals.ANNOUNCE_QUERY:
             [MessageHandler(Filters.all & (~ Filters.command), announce.announcement_confirm)],
@@ -81,12 +58,21 @@ def main():
             [MessageHandler(Filters.text & (~ Filters.command), admin.verify)]
     }
 
-    block_add_states = {
-        globals.BLOCK_ADD:
-            [MessageHandler(Filters.text & (~ Filters.command), block_add.confirm)]
+    add_states = {
+        globals.ADD:
+            [MessageHandler(Filters.text & (~ Filters.command), add.confirm)],
+        globals.PROJECT_CONFIRM:
+            [CallbackQueryHandler(add.project_confirm)]
     }
 
-    state_1 = {**add_states, **edit_states, **announce_states, **admin_states, **block_add_states}
+    suggest_states = {
+        globals.SUGGEST:
+            [MessageHandler(Filters.text & (~ Filters.command), suggest.confirm)],
+        globals.SUGGEST_CONFIRM:
+            [CallbackQueryHandler(suggest.project_confirm)]
+    }
+
+    state_1 = {**edit_states, **announce_states, **admin_states, **add_states, **suggest_states}
 
     state_2 = {
             globals.START: [CallbackQueryHandler(start.start_query)],
@@ -107,9 +93,9 @@ def main():
             CommandHandler("remove", remove.remove),
             CommandHandler("admin", admin.admin),
             CommandHandler("edit", edit.edit),
-            CommandHandler("add", add.add),
             CommandHandler("announce", announce.announce),
-            CommandHandler("block_add", block_add.block_add)
+            CommandHandler("add", add.add),
+            CommandHandler("suggestproject", suggest.suggest)
         ],
         states=all_states,
         fallbacks=[CommandHandler("cancel", cancel)],
@@ -121,7 +107,7 @@ def main():
 
     # updater.start_polling()
 
-    # # Start the Bot
+    # Start the Bot
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=TOKEN)
