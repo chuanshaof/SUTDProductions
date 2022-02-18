@@ -23,7 +23,6 @@ project_details = ["name",
                    "requirements",
                    "team"]
 
-
 # Editing projects
 # ---------------------------------------------------------------------------------------------#
 def edit(update: Update, context: CallbackContext) -> None:
