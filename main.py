@@ -10,9 +10,9 @@ import os
 
 """
 git add .
-git commit -m "changing python3 to python in Procfile"
+git commit -m "comments"
 git push heroku Head:master
-git push heroku master
+git push origin master
 """
 
 PORT = int(os.environ.get('PORT', 5000))
