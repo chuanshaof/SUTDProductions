@@ -43,7 +43,7 @@ def verify(update: Update, context: CallbackContext) -> None:
             admins = [update.message.from_user.id]
         else:
             admins.append(update.message.from_user.id)
-        firebase.db.child("admin").set(admins)
+        firebase.db.child("admin").set(admins,  firebase.user['idToken'])
     else:
         update.message.reply_text("Invalid")
 

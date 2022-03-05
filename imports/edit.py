@@ -101,12 +101,13 @@ def edit_query(update: Update, context: CallbackContext) -> None:
                 elif query.data == "confirm":
                     if project_details[every] + each in context.user_data["temp_edit"]:
                         if every == 0:
-                            firebase.db.child("project").child(each.replace("?", "%3F")).remove()
+                            firebase.db.child("project").child(each.replace("?", "%3F")).remove(firebase.user['idToken'])
 
                         length = len(project_details[every] + each)
                         projects[each][every] = context.user_data["temp_edit"][length:]
 
-                        firebase.db.child("project").child(projects[each][0].replace("?", "%3F")).set(projects[each])
+                        firebase.db.child("project").child(projects[each][0].replace("?", "%3F"))\
+                            .set(projects[each], firebase.user['idToken'])
 
                         query.edit_message_text(text=f"Project details have been updated as accordingly.\n\n"
                                                      f"{view_projects(projects[each])}",
