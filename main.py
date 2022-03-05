@@ -10,7 +10,6 @@ import os
 
 """
 git init
-git rm -r --cached firebase.py
 git remote add origin 'https://github.com/chuanshaof/SUTDProductionsBot'
 git remote add heroku 'https://git.heroku.com/sutdproductions.git'
 """
@@ -22,9 +21,11 @@ git merge origin master
 
 """
 git add .
-git commit -m "comments"
+git commit -m "message"
 git push heroku Head:master
+git rm -r --cached firebase.py
 git push origin master
+git add -f firebase.py
 """
 
 PORT = int(os.environ.get('PORT', 5000))
