@@ -28,7 +28,7 @@ def admin(update: Update, context: CallbackContext) -> int:
 # Admin Verification, step 2
 def verify(update: Update, context: CallbackContext) -> None:
     user_input = update.message.text
-    code = ***REMOVED***
+    code = "Scarlet_X"
 
     if user_input == code:
         update.message.reply_text("Verified, you can now utilize the following commands:\n\n"
