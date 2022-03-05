@@ -11,11 +11,11 @@ def subscribe(update: Update, context: CallbackContext) -> None:
     if subscribers != None:
         for each in subscribers:
             if each == str(update.message.from_user.id):
-                firebase.db.child("subscriber").child(str(update.message.from_user.id)).remove()
+                firebase.db.child("subscriber").child(str(update.message.from_user.id)).remove(firebase.user['idToken'])
                 update.message.reply_text("Unsubscribed from SUTDProductions, we hope to see you again!")
                 return
 
     new_sub = {update.message.from_user.id: update.message.from_user.username}
-    firebase.db.child("subscriber").update(new_sub)
-    update.message.reply_text("Subscribed to SUTDProductions bot.")
+    firebase.db.child("subscriber").update(new_sub, firebase.user['idToken'])
+    update.message.reply_text("Subscribed to SUTDProductions bot, we hope to see you soon!")
     return

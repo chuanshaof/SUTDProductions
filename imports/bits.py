@@ -22,7 +22,7 @@ def check_subs(update: Update, context: CallbackContext) -> None:
 def clear_admins(update: Update, context: CallbackContext) -> None:
     admins = firebase.db.child("admin").get().val()
     if admins is not None and update.message.from_user.id in admins:
-        firebase.db.child("admin").remove()
+        firebase.db.child("admin").remove(firebase.user['idToken'])
         update.message.reply_text("Admin list cleared.")
 
 

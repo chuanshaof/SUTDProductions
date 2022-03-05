@@ -8,7 +8,7 @@ from imports.bits import view_projects
 from imports import globals
 import firebase
 
-SOCIALS, VIEW_PROJECTS, SUGGEST = range(3)
+SOCIALS, VIEW_PROJECTS, SUGGEST, SUBSCRIBE = range(4)
 
 TOKEN = os.environ["API_KEY"]
 bot = Bot(TOKEN)
@@ -17,13 +17,24 @@ dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
 start_keyboard = [[InlineKeyboardButton("Join our telegram chat", url='https://t.me/joinchat/SME7jUkjNIcSKc9v')],
                   [InlineKeyboardButton("Suggest Project", callback_data=str(SUGGEST))],
                   [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))],
-                  [InlineKeyboardButton("View Projects", callback_data=str(VIEW_PROJECTS))]]
+                  [InlineKeyboardButton("View Projects", callback_data=str(VIEW_PROJECTS))],
+                  [InlineKeyboardButton("Subscribe to the bot for updates!", callback_data=str(SUBSCRIBE))]]
 
+unsub_start_keyboard = [[InlineKeyboardButton("Join our telegram chat", url='https://t.me/joinchat/SME7jUkjNIcSKc9v')],
+                  [InlineKeyboardButton("Suggest Project", callback_data=str(SUGGEST))],
+                  [InlineKeyboardButton("Socials", callback_data=str(SOCIALS))],
+                  [InlineKeyboardButton("View Projects", callback_data=str(VIEW_PROJECTS))]]
 
 # User Interface
 # ---------------------------------------------------------------------------------------------#
 def start(update: Update, context: CallbackContext) -> None:
+    subscribers = firebase.db.child("subscriber").get().val()
+
     reply_markup = InlineKeyboardMarkup(start_keyboard)
+
+    for each in subscribers:
+        if each == str(update.message.from_user.id):
+            reply_markup = InlineKeyboardMarkup(unsub_start_keyboard)
 
     bot.sendMessage(chat_id=update.message.chat_id,
                     text=f"Hello <b>{update.message.from_user.username}</b> and welcome to "
@@ -111,6 +122,22 @@ def start_query(update: Update, context: CallbackContext) -> None:
 
         reply_markup = InlineKeyboardMarkup(keyboard)
         query.edit_message_text(f"Connect with us via the various social medias!", reply_markup=reply_markup)
+
+    # This is for SUBSCRIBE
+    # -----------------------------------------------------------------------------------------------------------------#
+    if query.data == str(SUBSCRIBE):
+        subscribers = firebase.db.child("subscriber").get().val()
+        if subscribers != None:
+            for each in subscribers:
+                if each == str(query.from_user.id):
+                    firebase.db.child("subscriber").child(str(query.from_user.id)).remove(firebase.user['idToken'])
+                    query.edit_message_text("Unsubscribed from SUTDProductions, we hope to see you again!")
+                    return
+
+        new_sub = {query.from_user.id: query.from_user.username}
+        firebase.db.child("subscriber").update(new_sub, firebase.user['idToken'])
+        query.edit_message_text("Subscribed to SUTDProductions bot, we hope to see you soon!")
+        return
 
     # This is for view_projects
     # -----------------------------------------------------------------------------------------------------------------#
