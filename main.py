@@ -19,7 +19,11 @@ git remote add heroku 'https://git.heroku.com/sutdproductions.git'
 git add .
 git commit -m "comments"
 git push heroku Head:master
+<<<<<<< HEAD
 git push origin master
+=======
+git push github
+>>>>>>> f68992215cd6af650d9f86a21033942538f7e8b4
 """
 
 PORT = int(os.environ.get('PORT', 5000))
