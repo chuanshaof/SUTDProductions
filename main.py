@@ -9,6 +9,13 @@ import logging
 import os
 
 """
+git init
+git rm -r --cached ./firebase.py
+git remote add origin 'https://github.com/chuanshaof/SUTDProductionsBot'
+git remote add heroku 'https://git.heroku.com/sutdproductions.git'
+"""
+
+"""
 git add .
 git commit -m "comments"
 git push heroku Head:master
