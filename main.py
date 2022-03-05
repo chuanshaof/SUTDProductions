@@ -9,7 +9,6 @@ import logging
 import os
 
 """
-git init
 git remote add origin 'https://github.com/chuanshaof/SUTDProductionsBot'
 git remote add heroku 'https://git.heroku.com/sutdproductions.git'
 """
@@ -24,7 +23,7 @@ git add .
 git commit -m "message"
 git push heroku Head:master
 git rm -r --cached firebase.py
-git push origin master
+git push origin
 git add -f firebase.py
 """
 
@@ -117,13 +116,13 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    updater.start_polling()
+    # updater.start_polling()
 
     # Start the Bot
-    # updater.start_webhook(listen="0.0.0.0",
-    #                       port=int(PORT),
-    #                       url_path=TOKEN)
-    # updater.bot.setWebhook('https://sutdproductions.herokuapp.com/' + TOKEN)
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook('https://sutdproductions.herokuapp.com/' + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
