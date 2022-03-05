@@ -11,6 +11,7 @@ import os
 """
 git add .
 git commit -m "changing python3 to python in Procfile"
+git rm firebase.py
 git push heroku Head:master
 git push heroku master
 """
