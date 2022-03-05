@@ -16,6 +16,11 @@ git remote add heroku 'https://git.heroku.com/sutdproductions.git'
 """
 
 """
+git fetch origin master
+git merge origin master
+"""
+
+"""
 git add .
 git commit -m "comments"
 git push heroku Head:master
