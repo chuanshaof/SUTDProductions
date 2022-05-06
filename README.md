@@ -4,6 +4,13 @@ Built using Python and the Telegram library, the SUTD Productions Telegram Bot i
 
 Hosted on Heroku and Firebase.
 
+
+
+
+
+
+
+
 User functionalities
  - View existing projects
  - Join projects
