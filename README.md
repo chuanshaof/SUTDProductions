@@ -1,12 +1,19 @@
 # SUTDProductionsBot
 
-The SUTD Productions Telegram Bot is a bot that allows its users to 
+Built using Python and the Telegram library, the SUTD Productions Telegram Bot is a one-stop bot that allows users and admins to manage and view events at a glance. This bot promotes the organisation of events that promotes user outreach in a non-disruptive manner. 
+
+User functionalities
  - View existing projects
  - Join projects
  - Suggest projects
  - Subscribe to future project updates
  - View the club's various social media
- 
-There are also administrative functionalities that allows admins to login and update current projects and make announcements.
 
-The bot is mainly built on Python and uses the Telegram library. Hosted on Heroku and databased using Firebase.
+Administrative functionalities
+ - Add events
+ - Edit event details
+ - Delete events
+ - Get notification on user joined
+ - Make announcement to subscribers
+
+Hosted on Heroku and Firebase.
